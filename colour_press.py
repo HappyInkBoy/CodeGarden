@@ -26,7 +26,7 @@ score1 = 0
 score2 = 0
 
 wn = turtle.Screen()
-wn.title ("Colour Press by Alex")
+wn.title("Colour Press by Alex")
 wn.bgcolor("black")
 wn.setup(width = 600, height = 600)
 wn.tracer(0)
