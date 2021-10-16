@@ -19,6 +19,7 @@ player.penup()
 player.goto(0,0)
 
 failed = False
+paused = False
 
 plant1 = turtle.Turtle()
 plant1.speed(0)
@@ -59,6 +60,14 @@ plant4.penup()
 plant4.goto(125,-100)
 e4 = 100.0
 qe4 = random.uniform(1.0, 2.0)
+
+side_bar_left = turtle.Turtle()
+side_bar_left.speed(0)
+side_bar_left.shape("square")
+side_bar_left.color("white")
+side_bar_left.shapesize(stretch_wid = 3, stretch_len = 0.25)
+side_bar_left.penup()
+side_bar_left.goto(155,250)
 
 water_meter1 = turtle.Turtle()
 water_meter1.speed(0)
@@ -160,33 +169,56 @@ display_time_score.goto (-386,260)
 display_time_score.write("Score: {} sec".format (time_score), align = "left", font = ('Arial',24,'normal'))
 
 def score_timer():
-    global time_score, display_time_score, delay
+    global time_score, display_time_score, delay, paused
     time_score += 1
     if time_score == 20:
-        delay = 195
-    elif time_score == 25:
         delay = 190
-    elif time_score == 30:
-        delay = 185
-    elif time_score == 40:
+    elif time_score == 25:
         delay = 180
-    elif time_score == 50:
-        delay = 175
-    elif time_score == 60:
+    elif time_score == 30:
         delay = 170
-    elif time_score == 70:
-        delay = 165
-    elif time_score == 80:
+    elif time_score == 40:
         delay = 160
-    elif time_score == 90:
-        delay = 155
-    elif time_score == 100:
+    elif time_score == 50:
         delay = 150
+    elif time_score == 60:
+        delay = 140
+    elif time_score == 70:
+        delay = 130
+    elif time_score == 80:
+        delay = 120
+    elif time_score == 90:
+        delay = 110
+    elif time_score == 100:
+        delay = 100
     display_time_score.clear()
     display_time_score.write("Score: {} sec".format (time_score), align = "left", font = ('Arial',24,'normal'))
     wn.update()
-    if not failed:
+    if not failed and not paused:
         wn.ontimer(score_timer, 1000)
+
+paused_text = turtle.Turtle()
+paused_text.hideturtle()
+
+def pause_game():
+    global paused, paused_text
+    paused = not paused
+    if paused:
+        paused_text.speed(0)
+        paused_text.color("white")
+        paused_text.penup()
+        paused_text.hideturtle()
+        paused_text.goto(0,100)
+        paused_text.write("Paused", align ="center", font = ('Arial',32,'normal'))
+    else:
+        paused_text.clear()
+    wn.update()
+    if not failed and not paused:
+        wn.ontimer(score_timer, 1000)
+        wn.ontimer(timer1, delay)
+        wn.ontimer(timer2, delay)
+        wn.ontimer(timer3, delay)
+        wn.ontimer(timer4, delay)
 
 def display_lose_game():
     lose_game = turtle.Turtle()
@@ -234,8 +266,8 @@ def water_meter_update():
         water_meter1.hideturtle()
 
 def go_left():
-    global failed
-    if failed:
+    global failed, paused
+    if failed or paused:
         return
     x = player.xcor()
     x = x - 125
@@ -243,8 +275,8 @@ def go_left():
     wn.update()
 
 def go_right():
-    global failed
-    if failed:
+    global failed, paused
+    if failed or paused:
         return
     x = player.xcor()
     x = x + 125
@@ -252,8 +284,8 @@ def go_right():
     wn.update()
 
 def watering():
-    global e1, e2, e3, e4, water_score, failed
-    if failed:
+    global e1, e2, e3, e4, water_score, failed, paused
+    if failed or paused:
         return
     if water_score == 0:
         return
@@ -292,8 +324,8 @@ def watering():
         update_water_score()
 
 def refill():
-    global water_score, failed
-    if failed:
+    global water_score, failed, paused
+    if failed or paused:
         return
     if water_score == 8:
         return
@@ -336,6 +368,7 @@ wn.onkeypress(go_right, 'Right')
 wn.onkeypress(go_left, 'Left')
 wn.onkeypress(watering, 'w')
 wn.onkeypress(refill, 's')
+wn.onkeypress(pause_game, 'p')
 
 wn.update()
 
@@ -350,35 +383,35 @@ display_time_score.write("Score: {} sec".format (time_score), align = "left", fo
 wn.update()
 
 def timer1():
-    global e1, qe1, delay, plant1
+    global e1, qe1, delay, paused
     e1 -= qe1
     check_failed()
     draw_plant(plant1, e1)
-    if not failed:
+    if not failed and not paused:
         wn.ontimer(timer1, delay)
 
 def timer2():
-    global e2, qe2, delay
+    global e2, qe2, delay, paused
     e2 -= qe2
     check_failed()
     draw_plant(plant2, e2)
-    if not failed:
+    if not failed and not paused:
         wn.ontimer(timer2, delay)
 
 def timer3():
-    global e3, qe3, delay
+    global e3, qe3, delay, paused
     e3 -= qe3
     check_failed()
     draw_plant(plant3, e3)
-    if not failed:
+    if not failed and not paused:
         wn.ontimer(timer3, delay)
 
 def timer4():
-    global e4, qe4, delay
+    global e4, qe4, delay, paused
     e4 -= qe4
     check_failed()
     draw_plant(plant4, e4)
-    if not failed:
+    if not failed and not paused:
         wn.ontimer(timer4, delay)
 
 wn.ontimer(timer1, delay)
