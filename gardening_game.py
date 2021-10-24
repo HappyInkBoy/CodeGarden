@@ -8,13 +8,17 @@ wn.title("Gardening Game by Alex!")
 wn.bgcolor("black")
 wn.setup(width = 800, height = 600)
 wn.tracer(0)
+wn.bgpic("Background.gif")
+wn.addshape("Gardener.gif")
+wn.addshape("flower1.gif")
+wn.addshape("flower2.gif")
+wn.addshape("flower3.gif")
+wn.addshape("flower4.gif")
 
 # Player sprite
 player = turtle.Turtle()
 player.speed(0)
-player.shape("square")
-player.color("white")
-player.shapesize(stretch_wid = 4, stretch_len = 2)
+player.shape("Gardener.gif")
 player.penup()
 player.goto(0,0)
 
@@ -23,9 +27,7 @@ paused = False
 
 plant1 = turtle.Turtle()
 plant1.speed(0)
-plant1.shape("square")
-plant1.color("green")
-plant1.shapesize(stretch_wid = 2, stretch_len = 1)
+plant1.shape("flower1.gif")
 plant1.penup()
 plant1.goto(-250,-100)
 e1 = 100.0
@@ -33,9 +35,7 @@ qe1 = random.uniform(1.0, 2.0)
 
 plant2 = turtle.Turtle()
 plant2.speed(0)
-plant2.shape("square")
-plant2.color("green")
-plant2.shapesize(stretch_wid = 2, stretch_len = 1)
+plant2.shape("flower1.gif")
 plant2.penup()
 plant2.goto(-125,-100)
 e2 = 99.0
@@ -43,9 +43,7 @@ qe2 = random.uniform(1.0, 2.0)
 
 plant3 = turtle.Turtle()
 plant3.speed(0)
-plant3.shape("square")
-plant3.color("green")
-plant3.shapesize(stretch_wid = 2, stretch_len = 1)
+plant3.shape("flower1.gif")
 plant3.penup()
 plant3.goto(0,-100)
 e3 = 99.0
@@ -53,9 +51,7 @@ qe3 = random.uniform(1.0, 2.0)
 
 plant4 = turtle.Turtle()
 plant4.speed(0)
-plant4.shape("square")
-plant4.color("green")
-plant4.shapesize(stretch_wid = 2, stretch_len = 1)
+plant4.shape("flower1.gif")
 plant4.penup()
 plant4.goto(125,-100)
 e4 = 100.0
@@ -420,19 +416,17 @@ wn.ontimer(timer3, delay)
 wn.ontimer(timer4, delay)
 
 def draw_plant(plant, e):
-    color = "green"
+    shape = "flower1.gif"
     if e <= 0:
-        color = "grey"
+        shape = "flower4.gif"
         game_over()
     elif e <= 33:
-        color = "brown"
+        shape = "flower3.gif"
     elif e <= 66:
-        color = "yellow"
+        shape = "flower2.gif"
     
     plant.speed(0)
-    plant.shape("square")
-    plant.color(color)
-    plant.shapesize(stretch_wid = 2, stretch_len = 1)
+    plant.shape(shape)
     plant.penup()
     wn.update()
 
