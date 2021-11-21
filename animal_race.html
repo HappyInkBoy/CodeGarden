@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+   <head>
+  </head>
+   <body>
+<h1>My second adventure game</h1>
+
+<img src="guinea_pig.png" id="guinea_pig">
+<img src="pug.png" id="pug">
+
+<p>Alex.</p>
+<script>
+var x1 = 0;
+var x2 = 0;
+
+var elt1 = document.getElementById("guinea_pig");
+elt1.style.position = "absolute";
+elt1.style.left = x1 + 'px';
+elt1.style.top = 300 + 'px';
+
+var elt2 = document.getElementById("pug");
+elt2.style.position = "absolute";
+elt2.style.left = x2 + 'px';
+elt2.style.top = 100 + 'px';
+
+setInterval(function(){
+    x1 = x1 + 1;
+    elt1.style.left = x1 + 'px';
+    console.log("fuck you");
+}, 1000);
+
+</script>
+
+</body>
+</html>
