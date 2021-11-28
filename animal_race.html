@@ -5,11 +5,12 @@
    <body>
 <h1>My second adventure game</h1>
 
-<img src="guinea_pig.png" id="guinea_pig">
-<img src="pug.png" id="pug">
+<img src="guinea_pig.png" id="guinea_pig" width="250" height="180">
+<img src="pug.png" id="pug" width="250" height="180">
 
-<p>Alex.</p>
+<p id = "race">Super Race!</p>
 <script>
+// file:///Users/alex/Programs/animal_race.html
 var x1 = 0;
 var x2 = 0;
 var v1 = 1;
@@ -50,12 +51,24 @@ function logKey(e) {
   }
 }
 
-setInterval(function(){
+var interval = setInterval(function(){
     x1 = x1 + v1;
     elt1.style.left = x1 + 'px';
     x2 = x2 + v2;
     elt2.style.left = x2 + 'px';
-}, 1000);
+    if (x1 >= 1000){
+      // Pugsy win!
+      clearInterval(interval);
+      var raceElt = document.getElementById("race");
+      raceElt.innerHTML = "Pugsy Wins!";
+    }
+    if (x2 >= 1000){
+      //Guinea Pig Win!
+      clearInterval(interval);
+      var raceElt = document.getElementById("race");
+      raceElt.innerHTML = "Guinea Pig Wins!";
+    }
+}, 30);
 
 </script>
 
