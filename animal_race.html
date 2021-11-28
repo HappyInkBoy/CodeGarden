@@ -12,20 +12,49 @@
 <script>
 var x1 = 0;
 var x2 = 0;
+var v1 = 1;
+var v2 = 1;
 
-var elt1 = document.getElementById("guinea_pig");
-elt1.style.position = "absolute";
-elt1.style.left = x1 + 'px';
-elt1.style.top = 300 + 'px';
-
-var elt2 = document.getElementById("pug");
+var elt2 = document.getElementById("guinea_pig");
 elt2.style.position = "absolute";
 elt2.style.left = x2 + 'px';
-elt2.style.top = 100 + 'px';
+elt2.style.top = 300 + 'px';
+
+var elt1 = document.getElementById("pug");
+elt1.style.position = "absolute";
+elt1.style.left = x1 + 'px';
+elt1.style.top = 100 + 'px';
+
+var d = new Date();
+var time = d.getTime();
+
+var t1 = Math.random();
+var t2 = Math.random();
+
+document.addEventListener('keydown', logKey);
+
+function logKey(e) {
+  if (e.key == 's') {
+    console.log("pugsy");
+    var t = new Date().getMilliseconds();
+    if (Math.abs(t-t1) < 1000){
+        v1 = v1 * 1.1;
+    }
+  }
+  if (e.key == 'k') {
+    console.log("guinea_pig");
+    var t = new Date().getMilliseconds();
+    if (Math.abs(t-t2) < 1000){
+        v2 = v2 * 1.1;
+    }
+  }
+}
 
 setInterval(function(){
-    x1 = x1 + 1;
+    x1 = x1 + v1;
     elt1.style.left = x1 + 'px';
+    x2 = x2 + v2;
+    elt2.style.left = x2 + 'px';
 }, 1000);
 
 </script>
