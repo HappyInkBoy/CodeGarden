@@ -51,54 +51,52 @@ function logKeyDown(e) {
 }
 
 document.addEventListener('keyup', logKeyUp);
-
+function speed(v, diff){
+  if (v <= 8) {
+      v = 8;
+  }
+  if (diff > 1000) {
+      v = v * 0.01;
+    }
+    if (diff >= 999 && diff <= 1000) {
+      v = 1000;
+    }
+    if (diff >= 900 && diff < 999) {
+      v = v * 1.5;
+    } 
+    if (diff >= 800 && diff < 900) {
+      v = v * 1.25;
+    }
+    if (diff >= 500 && diff < 800 ) {
+      v = v * 1.10;
+    }
+    if (diff >= 300 && diff < 500) {
+      v = v * 1.05;
+    }
+    if (diff < 300) {
+      v = v * 0.75;
+    }
+    return v;
+}
 function logKeyUp(e) {
   if (e.key == 's') {
     t1Up = new Date();
     var diff = t1Up - t1Down;
-    if (diff >= 900 && diff <= 1000){
-      v1 = 100;
-    } 
-    if (diff >= 800 && diff < 900){
-      v1 = 50;
-    }
-    if (diff >= 500 && diff < 800 ){
-      v1 = 20;
-    }
-    if (diff >= 300 && diff < 500){
-      v1 = 5;
-    }
-    if (diff < 300){
-      v1 = 0;
-    }
+    v1 = speed(v1, diff);
   }
   if (e.key == 'k') {
     t2Up = new Date();
     var diff = t2Up - t2Down;
-    if (diff >= 900 && diff <= 1000){
-      v2 = 100;
-    } 
-    if (diff >= 800 && diff < 900){
-      v2 = 50;
-    }
-    if (diff >= 500 && diff < 800 ){
-      v2 = 20;
-    }
-    if (diff >= 300 && diff < 500){
-      v2 = 5;
-    }
-    if (diff < 300){
-      v2 = 0;
-    }
+    v2 = speed(v2, diff);
   }
 }
 
 var interval = setInterval(function(){
     x1 = x1 + v1;
-    v1 = v1/2;
+    v1 = v1 * 0.9;
     elt1.style.left = x1 + 'px';
     x2 = x2 + v2;
-    v2 = v2/2;
+    v2 = v2 * 0.9;
     elt2.style.left = x2 + 'px';
     if (x1 >= 1000){
       // Pugsy win!
@@ -112,7 +110,7 @@ var interval = setInterval(function(){
       var raceElt = document.getElementById("race");
       raceElt.innerHTML = "Guinea Pig Wins!";
     }
-}, 30);
+  }, 30);
 
 </script>
 
