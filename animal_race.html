@@ -5,6 +5,9 @@
    <body>
 <h1>My second adventure game</h1>
 
+<div id = "p1_score">P1 ❚ ❚ ❚ ❚ ❚ ❚ ❚ ❚ ❚ ❚</div>
+<div id = "p2_score">P2 ❚ ❚ ❚ ❚ ❚ ❚ ❚ ❚ ❚ ❚</div>
+
 <img src="guinea_pig.png" id="guinea_pig" width="250" height="180">
 <img src="pug.png" id="pug" width="250" height="180">
 
@@ -19,6 +22,20 @@ var t1Down = 0;
 var t1Up = 0;
 var t2Down = 0;
 var t2Up = 0;
+
+var meter1 = document.getElementById("p1_score");
+meter1.style.position = "absolute";
+meter1.style.left = "460px";
+meter1.style.top = "25px";
+meter1.style.color = "#00ffff";
+meter1.style.fontSize = "50px";
+
+var meter2 = document.getElementById("p2_score");
+meter2.style.position = "absolute";
+meter2.style.left = "900px";
+meter2.style.top = "25px";
+meter2.style.color = "#9900ff";
+meter2.style.fontSize = "50px";
 
 var elt1 = document.getElementById("pug");
 elt1.style.position = "absolute";
@@ -59,22 +76,22 @@ function speed(v, diff){
       v = v * 0.01;
     }
     if (diff >= 999 && diff <= 1000) {
-      v = 1000;
+      v = v * 10;
     }
     if (diff >= 900 && diff < 999) {
-      v = v * 1.5;
+      v = v * 1.80;
     } 
     if (diff >= 800 && diff < 900) {
-      v = v * 1.25;
+      v = v * 1.35;
     }
     if (diff >= 500 && diff < 800 ) {
-      v = v * 1.10;
-    }
-    if (diff >= 300 && diff < 500) {
       v = v * 1.05;
     }
+    if (diff >= 300 && diff < 500) {
+      v = v * 1.025;
+    }
     if (diff < 300) {
-      v = v * 0.75;
+      v = v * 0;
     }
     return v;
 }
@@ -83,12 +100,30 @@ function logKeyUp(e) {
     t1Up = new Date();
     var diff = t1Up - t1Down;
     v1 = speed(v1, diff);
+    showScore("P1", meter1, diff);
   }
   if (e.key == 'k') {
     t2Up = new Date();
     var diff = t2Up - t2Down;
     v2 = speed(v2, diff);
+    showScore("P2", meter2, diff);
   }
+}
+function showScore (player, scoreElt, diff){
+  var bars = diff / 100;
+  var tooMuch = false;
+  if (bars > 10) {
+    bars = 10;
+    tooMuch = true;
+  }
+  var message = player + " ";
+  for (i = 0; i < bars; i++) {
+    message = message + "❚ ";
+  }
+  if (tooMuch) {
+    message = message + "{}";
+  }
+  scoreElt.innerHTML = message;
 }
 
 var interval = setInterval(function(){
