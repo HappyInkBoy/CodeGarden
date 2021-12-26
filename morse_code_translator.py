@@ -1,4 +1,4 @@
-text = input('I am a translator, translate morse code with me (if you are writing in morse code, remember to start the message with a space):\n')
+text = input('I am a translator, enter a message below to be translated into morse code:\n')
 
 morseDictionary = {
     "a" : '.-',
@@ -30,18 +30,18 @@ morseDictionary = {
 }
 
 reverseMorseDictionary = {v: k for k, v in morseDictionary.items()}
-print (reverseMorseDictionary)
 
-def alpha2Morse (letter):
-    if letter in morseDictionary:
-        return morseDictionary[letter]
-    elif letter in reverseMorseDictionary:
-        return reverseMorseDictionary[letter]
-    else:
-        return ' '
-
+text = text + " "
 result = ""
-
+token = ""
 for toot in text:
-    result = result + ' ' + alpha2Morse (toot)
+    if toot in morseDictionary:
+        result = result + " " + morseDictionary[toot]
+    elif toot == "." or toot == "-":
+        token = token + toot
+    elif toot == " ":
+        result = result + " "
+        if token != "":
+            result = result + reverseMorseDictionary[token]
+            token = ""
 print (result)
