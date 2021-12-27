@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+   <head>
+  </head>
+   <body>
+<h1>Translate a message into or from morse code:</h1>
+
+<textarea id = "text" rows = "6" cols = "80">
+Input a message in this box to be translated
+</textarea>
+
+<div id = "response" style = "font-size:30px; font-family: monospace;"></div>
+
+<script>
+var textElement = document.getElementById("text");
+var responseElement = document.getElementById("response");
+
+textElement.addEventListener("input", function(){
+    console.log("yay!");
+    var translation = translate(textElement.value);
+    responseElement.innerHTML = translation;
+})
+morseDictionary = {
+    "a" : '.-',
+    "b" : '-...',
+    "c" : '-.-.',
+    "d" : '-..',
+    "e" : '.',
+    "f" : '..-.',
+    "g" : '--.',
+    "h" : '....',
+    "i" : '..',
+    "j" : '.---',
+    "k" : '-.-',
+    "l" : '.-..',
+    "m" : '--',
+    "n" : '-.',
+    "o" : '---',
+    "p" : '.--.',
+    "q" : '--.-',
+    "r" : '.-.',
+    "s" : '...',
+    "t" : '-',
+    "u" : '..-',
+    "v" : '...-',
+    "w" : '.--',
+    "x" : '-..-',
+    "y" : '-.--',
+    "z" : '..--',
+    " " : ' '
+};
+function translate(sentence) {
+    var result = ""
+    for (i = 0; i < sentence.length; i++) {
+        letter = sentence.charAt(i);
+        translation = morseDictionary[letter];
+        result = result + " " + translation;
+        console.log(translation);
+    }
+    return result;
+}
+</script>
+
+</body>
+</html>
