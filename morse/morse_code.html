@@ -5,57 +5,71 @@
    <body>
 <h1>Translate a message into or from morse code:</h1>
 
-<textarea id = "text" rows = "6" cols = "80">
-Input a message in this box to be translated
-</textarea>
+<textarea id = 'text' rows = '6' cols = '80'></textarea>
 
-<div id = "response" style = "font-size:30px; font-family: monospace;"></div>
+<div id = 'response' style = 'font-size:30px; font-family: monospace;'></div>
 
 <script>
-var textElement = document.getElementById("text");
-var responseElement = document.getElementById("response");
+var textElement = document.getElementById('text');
+var responseElement = document.getElementById('response');
 
-textElement.addEventListener("input", function(){
-    console.log("yay!");
+textElement.addEventListener('input', function(){
     var translation = translate(textElement.value);
     responseElement.innerHTML = translation;
 })
 morseDictionary = {
-    "a" : '.-',
-    "b" : '-...',
-    "c" : '-.-.',
-    "d" : '-..',
-    "e" : '.',
-    "f" : '..-.',
-    "g" : '--.',
-    "h" : '....',
-    "i" : '..',
-    "j" : '.---',
-    "k" : '-.-',
-    "l" : '.-..',
-    "m" : '--',
-    "n" : '-.',
-    "o" : '---',
-    "p" : '.--.',
-    "q" : '--.-',
-    "r" : '.-.',
-    "s" : '...',
-    "t" : '-',
-    "u" : '..-',
-    "v" : '...-',
-    "w" : '.--',
-    "x" : '-..-',
-    "y" : '-.--',
-    "z" : '..--',
-    " " : ' '
+    'a' : '.-',
+    'b' : '-...',
+    'c' : '-.-.',
+    'd' : '-..',
+    'e' : '.',
+    'f' : '..-.',
+    'g' : '--.',
+    'h' : '....',
+    'i' : '..',
+    'j' : '.---',
+    'k' : '-.-',
+    'l' : '.-..',
+    'm' : '--',
+    'n' : '-.',
+    'o' : '---',
+    'p' : '.--.',
+    'q' : '--.-',
+    'r' : '.-.',
+    's' : '...',
+    't' : '-',
+    'u' : '..-',
+    'v' : '...-',
+    'w' : '.--',
+    'x' : '-..-',
+    'y' : '-.--',
+    'z' : '..--',
+    ' ' : ' ',
+    '.-': 'a'
 };
+function isLetter(str) {
+  return str.length === 1 && str.match(/[a-z]/i);
+}
 function translate(sentence) {
-    var result = ""
+    var result = ''
+    var token = ''
     for (i = 0; i < sentence.length; i++) {
         letter = sentence.charAt(i);
-        translation = morseDictionary[letter];
-        result = result + " " + translation;
-        console.log(translation);
+        if (letter == '-' || letter == '.') {
+            token = token + letter;
+        }
+        if (letter == ' ') {
+            result = result + '&nbsp;';
+            if (token != '') {
+                translation = morseDictionary[token];
+                result = result + translation;
+                token = ''
+            }
+        }
+        if (isLetter(letter)) {
+            translation = morseDictionary[letter];
+            result = result + '&nbsp;' + translation;
+        }
     }
     return result;
 }
