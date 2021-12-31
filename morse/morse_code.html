@@ -44,22 +44,48 @@ morseDictionary = {
     'x' : '-..-',
     'y' : '-.--',
     'z' : '..--',
-    ' ' : ' ',
-    '.-': 'a'
+    '.-' : 'a',
+    '-...' : 'b',
+    '-.-.' : 'c',
+    '-..' : 'd',
+    '.' : 'e',
+    '..-.' : 'f',
+    '--.' : 'g',
+    '....' : 'h',
+    '..' : 'i',
+    '.---' : 'j',
+    '-.-' : 'k',
+    '.-..' : 'l',
+    '--' : 'm',
+    '-.' : 'n',
+    '---' : 'o',
+    '.--.' : 'p',
+    '--.-' : 'q',
+    '.-.' : 'r',
+    '...' : 's',
+    '-' : 't',
+    '..-' : 'u',
+    '...-' : 'v',
+    '.--' : 'w',
+    '-..-' : 'x',
+    '-.--' : 'y',
+    '--..' : 'z',
+    ' ' : ' '
 };
 function isLetter(str) {
   return str.length === 1 && str.match(/[a-z]/i);
 }
 function translate(sentence) {
-    var result = ''
-    var token = ''
+    var result = '';
+    var token = '';
+    sentence = sentence + ' ';
     for (i = 0; i < sentence.length; i++) {
         letter = sentence.charAt(i);
         if (letter == '-' || letter == '.') {
             token = token + letter;
         }
         if (letter == ' ') {
-            result = result + '&nbsp;';
+            result = result + '&#32;';
             if (token != '') {
                 translation = morseDictionary[token];
                 result = result + translation;
@@ -68,7 +94,7 @@ function translate(sentence) {
         }
         if (isLetter(letter)) {
             translation = morseDictionary[letter];
-            result = result + '&nbsp;' + translation;
+            result = result + '&#32;' + translation;
         }
     }
     return result;
