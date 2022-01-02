@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+   <head>
+  </head>
+   <body>
+<h1>Sort my numbers</h1>
+
+<textarea id = 'text' rows = '6' cols = '80'></textarea>
+
+<h1></h1>
+
+<input type="radio" id="even" name="numbers">
+<label for="even">Show even numbers only</label><br>
+<input type="radio" id="odd" name="numbers">
+<label for="odd">Show odd numbers only</label><br>
+<input type="radio" id="ascending" name="numbers">
+<label for="ascending">Sort in ascending order</label>
+
+<div id = 'response' style = 'font-size:30px; font-family: monospace;'></div>
+
+<script>
+var textElement = document.getElementById('text');
+var responseElement = document.getElementById('response');
+
+textElement.addEventListener('input', function(){
+    var elements = textElement.value.split(' ');
+    var numbers = [];
+    for (i = 0; i < elements.length; i++) {
+        numbers[i] = Number(elements[i]);
+    }
+    var result = toEvenArrays(numbers);
+    responseElement.innerHTML = result;
+})
+
+function toEvenArrays(numbers) {
+    var result = [];
+    for (i = 0; i < numbers.length; i++) {
+        toot = numbers[i];
+        if (toot % 2 == 0) {
+            result.push(toot);
+        }
+    }
+    return result;
+}
+
+</script>
+
+</body>
+</html>
