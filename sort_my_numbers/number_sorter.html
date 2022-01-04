@@ -28,16 +28,35 @@ textElement.addEventListener('input', function(){
     for (i = 0; i < elements.length; i++) {
         numbers[i] = Number(elements[i]);
     }
-    var result = toEvenArrays(numbers);
-    responseElement.innerHTML = result;
-})
+    var evenValue = document.getElementById('even').checked;
+    if (evenValue) {
+        var result = toEvenArrays(numbers);
+        responseElement.innerHTML = result;
+    }
+    var oddValue = document.getElementById('odd').checked;
+    if (oddValue) {
+        var result = toOddArrays(numbers);
+        responseElement.innerHTML = result;
+    }
+});
 
 function toEvenArrays(numbers) {
     var result = [];
     for (i = 0; i < numbers.length; i++) {
-        toot = numbers[i];
+        var toot = numbers[i];
         if (toot % 2 == 0) {
             result.push(toot);
+        }
+    }
+    return result;
+}
+
+function toOddArrays(numbers) {
+    var result = [];
+    for (i = 0; i < numbers.length; i++) {
+        var toot = numbers[i];
+        if (toot % 2 != 0) {
+            result.push(toot)
         }
     }
     return result;
