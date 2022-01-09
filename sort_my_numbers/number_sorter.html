@@ -14,7 +14,9 @@
 <input type="radio" id="odd" name="numbers">
 <label for="odd">Show odd numbers only</label><br>
 <input type="radio" id="ascending" name="numbers">
-<label for="ascending">Sort in ascending order</label>
+<label for="ascending">Sort in ascending order</label><br>
+<input type="radio" id="descending" name="numbers">
+<label for="descending">Sort in descending order</label>
 
 <div id = 'response' style = 'font-size:30px; font-family: monospace;'></div>
 
@@ -38,6 +40,16 @@ textElement.addEventListener('input', function(){
         var result = toOddArrays(numbers);
         responseElement.innerHTML = result;
     }
+    var ascendingValue = document.getElementById('ascending').checked;
+    if (ascendingValue) {
+        var result = toAscendingArrays(numbers);
+        responseElement.innerHTML = result;
+    }
+    var descendingValue = document.getElementById('descending').checked;
+    if (descendingValue) {
+        var result = toDescendingArrays(numbers);
+        responseElement.innerHTML = result;
+    }
 });
 
 function toEvenArrays(numbers) {
@@ -59,6 +71,29 @@ function toOddArrays(numbers) {
             result.push(toot)
         }
     }
+    return result;
+}
+
+function toAscendingArrays(numbers) {
+    return numbers.sort(function(a,b){return a - b});
+}
+
+function toDescendingArrays(numbers) {
+    return numbers.sort(function(a,b){return b - a});
+}
+
+function toAlexAscendingArrays(numbers) {
+    var result = [];
+    var smallestNumber = 1e10;
+    var smallestIndex = 1e10;
+    for (i = 0; i < numbers.length; i++) {
+        if(numbers[i] < smallestNumber) {
+            smallestNumber = numbers[i];
+            smallestIndex = i;
+        }
+    }
+    numbers[smallestIndex] = 1e10;
+    result.push(smallestNumber);
     return result;
 }
 
