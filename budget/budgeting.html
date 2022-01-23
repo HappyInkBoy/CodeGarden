@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+   <head>
+  </head>
+   <body>
+<h1>My budgeting website!</h1>
+
+<label for="income">Annual income:</label>
+<input type="number" id="income" name="income"/>><br><br>
+
+<label for="tax">Annual tax:</label>
+<input type="number" id="tax" name="tax"><br><br>
+
+<div>Net income (after tax)</div>
+<div id="net"></div>
+
+<script>
+
+var incomeElement = document.getElementById('income');
+var taxElement = document.getElementById('tax');
+var netElement = document.getElementById('net');
+incomeElement.addEventListener('input', update);
+taxElement.addEventListener('input', update);
+
+function update() {
+    var income = incomeElement.value;
+    var tax = taxElement.value;
+    var net = income - tax;
+    netElement.innerHTML = net;
+}
+
+</script>
+
+</body>
+</html>
