@@ -6,10 +6,10 @@
 <h1>My budgeting website!</h1>
 
 <label for="income">Annual income:</label>
-<input type="number" id="income" name="income"/>><br><br>
+<input type="number" id="income" name="income"/><br><br>
 
-<label for="tax">Annual tax:</label>
-<input type="number" id="tax" name="tax"><br><br>
+<div>Taxes (Federal + Ontario)</div>
+<div id="tax"></div><br>
 
 <div>Net income (after tax)</div>
 <div id="net"></div>
@@ -24,9 +24,18 @@ taxElement.addEventListener('input', update);
 
 function update() {
     var income = incomeElement.value;
-    var tax = taxElement.value;
-    var net = income - tax;
-    netElement.innerHTML = net;
+    var tax = 0;
+    if (income <= 46000) {
+        tax = income * 0.2;
+    }
+    if (income > 46000 && income <= 81000) {
+        tax = 46000 * 0.2 + (income - 46000) * 0.3;
+    }
+    if (income > 81000 && income <= 100000) {
+        tax = 46000 * 0.2 + 45000 * 0.3 + (income - 81000) * 0.38;
+    }
+    taxElement.innerHTML = tax;
+    netElement.innerHTML = income - tax;
 }
 
 </script>
