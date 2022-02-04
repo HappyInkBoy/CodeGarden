@@ -1,26 +1,58 @@
 <!DOCTYPE html>
 <html>
+<style>
+table, th, td {
+    border:1px solid black;
+}
+</style>
    <head>
   </head>
    <body>
 <h1>My budgeting website!</h1>
 
-<label for="income">Annual income:</label>
-<input type="number" id="income" name="income"/><br><br>
+<table style="width:100%">
+    <tr>
+        <th>Income</th>
+        <th>Spending</th>
+        <th>Saving</th>
+    </tr>
+    <tr>
+        <td>
+            <label for="income">Annual Income:</label>
+            <input type="number" id="income" name="income"/><br><br>
 
-<div>Taxes (Federal + Ontario)</div>
-<div id="tax"></div><br>
+            <div>Taxes (Federal + Ontario)</div>
+            <div id="tax"></div><br>
 
-<div>Net income (after tax)</div>
-<div id="net"></div>
+            <div>Net income (after tax)</div>
+            <div id="net"></div>
+        </td>
+        <td>
+            <label for="monthly_spending">Monthly Spending:</label>
+            <input type="number" id="monthly_spending" name="monthly_spending"/><br><br>
+
+            <div>Annual Spending</div>
+            <div id="annual_spending"></div><br>
+        </td>
+        <td>
+            <div>Annual Saving</div>
+            <div id="annual_saving"></div><br>
+        </td>
+    </tr>
+</table>
 
 <script>
 
 var incomeElement = document.getElementById('income');
 var taxElement = document.getElementById('tax');
 var netElement = document.getElementById('net');
+var monthlySpendingElement = document.getElementById('monthly_spending');
+var annualSpendingElement = document.getElementById('annual_spending');
+var annualSavingElement = document.getElementById('annual_saving');
 incomeElement.addEventListener('input', update);
 taxElement.addEventListener('input', update);
+monthlySpendingElement.addEventListener('input', update);
+
 
 function update() {
     var income = incomeElement.value;
@@ -34,8 +66,30 @@ function update() {
     if (income > 81000 && income <= 100000) {
         tax = 46000 * 0.2 + 45000 * 0.3 + (income - 81000) * 0.38;
     }
+    if (income > 100000 && income <= 156000) {
+        tax = 46000 * 0.2 + 45000 * 0.3 + 19000 * 0.38 + (income - 100000) * 0.45;
+    }
+    if (income > 156000 && income <= 222000) {
+        tax = 46000 * 0.2 + 45000 * 0.3 + 19000 * 0.38 + 56000 * 0.45 + (income - 156000) * 0.50;
+    }
+    if (income > 222000) {
+        tax = 46000 * 0.2 + 45000 * 0.3 + 19000 * 0.38 + 56000 * 0.45 + 66000 * 0.50 + (income - 222000) * 0.54;
+    }
     taxElement.innerHTML = tax;
     netElement.innerHTML = income - tax;
+    
+    var monthlySpending = monthlySpendingElement.value;
+    var annualSpending = monthlySpending * 12;
+    annualSpendingElement.innerHTML = annualSpending;
+
+    var annualSaving = (income - tax) - annualSpending;
+    annualSavingElement.innerHTML = annualSaving;
+    if (annualSaving => 0) {
+        document.getElementById("annual_saving").style.backgroundColor = "green";
+    }
+    if (annualSaving < 0) {
+        document.getElementById("annual_saving").style.backgroundColor = "red";
+    }
 }
 
 </script>
