@@ -5,6 +5,9 @@
     <label for="ordered">Ordered Letters:</label>
     <input type="text" id="ordered" name="ordered"><br><br>
 
+    <label for="unordered">Unordered Letters:</label>
+    <input type="text" id="unordered" name="unordered"><br><br>
+
     <label for="excluded">Excluded Letters:</label>
     <input type="text" id="excluded" name="excluded"><br><br>
 
@@ -18,6 +21,7 @@
 <script>
 
 var orderedElement = document.getElementById("ordered");
+var unorderedElement = document.getElementById("unordered")
 var excludedElement = document.getElementById("excluded");
 var searchingElement = document.getElementById("searching");
 var displayWordElement = document.getElementById("matching");
@@ -40,8 +44,10 @@ var words = ["AAHED", "AALII", "AARGH", "AARTI", "ABACA", "ABACI", "ABACK", "ABA
 ];
 
 function search() {
+    displayWordElement.innerHTML = "";
     var i;
     var excluded = excludedElement.value.toUpperCase();
+    var unordered = unorderedElement.value.toUpperCase();
     for (i = 0; i < words.length; i++) {
         var word = words[i];
 
@@ -54,7 +60,18 @@ function search() {
                 break;
             }
         }
-        if (excludeCheck == false) {
+        
+        var j;
+        var unorderedCheck = true;
+        for (j = 0; j < unordered.length; j++) {
+            var unorderedLetter = unordered.charAt(j);
+            if (word.indexOf(unorderedLetter) == -1) {
+                unorderedCheck = false;
+                break;
+            }
+
+        }
+        if (unorderedCheck == true && excludeCheck == false) {
             displayWord(word);
         }
     }
