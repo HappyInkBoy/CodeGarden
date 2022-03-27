@@ -48,10 +48,26 @@ function search() {
     var i;
     var excluded = excludedElement.value.toUpperCase();
     var unordered = unorderedElement.value.toUpperCase();
+    var ordered = orderedElement.value.toUpperCase();
     for (i = 0; i < words.length; i++) {
         var word = words[i];
-
         var j;
+        
+        var orderedCheck = true;
+        for (j = 0; j < ordered.length; j++) {
+            var orderedLetter = ordered.charAt(j);
+            if (orderedLetter == "*") {
+                continue;
+            }
+            if (word.charAt(j) != orderedLetter) {
+                orderedCheck = false;
+                break;
+            }
+        }
+        if (!orderedCheck) {
+            continue;
+        }
+
         var excludeCheck = false;
         for (j = 0; j < excluded.length; j++) {
             var excludedLetter = excluded.charAt(j);
