@@ -5,8 +5,20 @@
     <label for="ordered">Ordered Letters:</label>
     <input type="text" id="ordered" name="ordered"><br><br>
 
-    <label for="unordered">Unordered Letters:</label>
-    <input type="text" id="unordered" name="unordered"><br><br>
+    <label for="unordered1">Unordered Letters 1:</label>
+    <input type="text" id="unordered1" name="unordered1"><br><br>
+
+    <label for="unordered2">Unordered Letters 2:</label>
+    <input type="text" id="unordered2" name="unordered2"><br><br>
+
+    <label for="unordered3">Unordered Letters 3:</label>
+    <input type="text" id="unordered3" name="unordered3"><br><br>
+
+    <label for="unordered4">Unordered Letters 4:</label>
+    <input type="text" id="unordered4" name="unordered4"><br><br>
+
+    <label for="unordered5">Unordered Letters 5:</label>
+    <input type="text" id="unordered5" name="unordered5"><br><br>
 
     <label for="excluded">Excluded Letters:</label>
     <input type="text" id="excluded" name="excluded"><br><br>
@@ -21,7 +33,11 @@
 <script>
 
 var orderedElement = document.getElementById("ordered");
-var unorderedElement = document.getElementById("unordered")
+var unordered1Element = document.getElementById("unordered1");
+var unordered2Element = document.getElementById("unordered2");
+var unordered3Element = document.getElementById("unordered3");
+var unordered4Element = document.getElementById("unordered4");
+var unordered5Element = document.getElementById("unordered5");
 var excludedElement = document.getElementById("excluded");
 var searchingElement = document.getElementById("searching");
 var displayWordElement = document.getElementById("matching");
@@ -47,12 +63,24 @@ function search() {
     displayWordElement.innerHTML = "";
     var i;
     var excluded = excludedElement.value.toUpperCase();
-    var unordered = unorderedElement.value.toUpperCase();
+    var unordered1 = unordered1Element.value.toUpperCase();
+    var unordered2 = unordered2Element.value.toUpperCase();
+    var unordered3 = unordered3Element.value.toUpperCase();
+    var unordered4 = unordered4Element.value.toUpperCase();
+    var unordered5 = unordered5Element.value.toUpperCase();
     var ordered = orderedElement.value.toUpperCase();
     for (i = 0; i < words.length; i++) {
         var word = words[i];
         var j;
         
+        if ((word.charAt(0) == unordered1)) {
+            continue;
+        }
+        if (word.charAt(1) != unordered1 && word.charAt(2) != unordered1 && word.charAt(3) != unordered1 && word.charAt(4) != unordered1) {
+            continue;
+        }
+
+
         var orderedCheck = true;
         for (j = 0; j < ordered.length; j++) {
             var orderedLetter = ordered.charAt(j);
@@ -76,18 +104,7 @@ function search() {
                 break;
             }
         }
-        
-        var j;
-        var unorderedCheck = true;
-        for (j = 0; j < unordered.length; j++) {
-            var unorderedLetter = unordered.charAt(j);
-            if (word.indexOf(unorderedLetter) == -1) {
-                unorderedCheck = false;
-                break;
-            }
-
-        }
-        if (unorderedCheck == true && excludeCheck == false) {
+        if (excludeCheck == false) {
             displayWord(word);
         }
     }
