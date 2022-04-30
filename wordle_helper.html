@@ -160,18 +160,19 @@ function search() {
                 continue;
             }
             if (word.charAt(j) != orderedLetter) {
+                orderedCheck = false;
                 continue;
             }
         }
         if (!orderedCheck) {
             continue;
         }
-
         var excludeCheck = false;
         for (j = 0; j < excluded.length; j++) {
             var excludedLetter = excluded.charAt(j);
             if (word.indexOf(excludedLetter) != -1) {
-                continue;
+                excludeCheck = true;
+                break;
             }
         }
 
@@ -182,8 +183,8 @@ function search() {
 }
 
 function displayWord(word) {
-    console.log(word);
-//    displayWordElement.innerHTML += "<br></br>"+word;
+    //console.log(word);
+    displayWordElement.innerHTML += "<br></br>"+word;
 }
 
 </script>
