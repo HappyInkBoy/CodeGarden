@@ -73,13 +73,85 @@ function search() {
         var word = words[i];
         var j;
         
-        if ((word.charAt(0) == unordered1)) {
-            continue;
+        var continueCheck = false;
+        for (j = 0; j < unordered1.length; j++) {
+            var unorderedLetter = unordered1.charAt(j);
+            if (word.charAt(0) == unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+            if (word.charAt(1) != unorderedLetter && word.charAt(2) != unorderedLetter && word.charAt(3) != unorderedLetter && word.charAt(4) != unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
         }
-        if (word.charAt(1) != unordered1 && word.charAt(2) != unordered1 && word.charAt(3) != unordered1 && word.charAt(4) != unordered1) {
+        if (continueCheck) {
             continue;
         }
 
+        var continueCheck = false;
+        for (j = 0; j < unordered2.length; j++) {
+            var unorderedLetter = unordered2.charAt(j);
+            if (word.charAt(1) == unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+            if (word.charAt(0) != unorderedLetter && word.charAt(2) != unorderedLetter && word.charAt(3) != unorderedLetter && word.charAt(4) != unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+        }
+        if (continueCheck) {
+            continue;
+        }
+
+        var continueCheck = false;
+        for (j = 0; j < unordered3.length; j++) {
+            var unorderedLetter = unordered3.charAt(j);
+            if (word.charAt(2) == unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+            if (word.charAt(0) != unorderedLetter && word.charAt(1) != unorderedLetter && word.charAt(3) != unorderedLetter && word.charAt(4) != unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+        }
+        if (continueCheck) {
+            continue;
+        }
+
+        var continueCheck = false;
+        for (j = 0; j < unordered4.length; j++) {
+            var unorderedLetter = unordered4.charAt(j);
+            if (word.charAt(3) == unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+            if (word.charAt(0) != unorderedLetter && word.charAt(1) != unorderedLetter && word.charAt(2) != unorderedLetter && word.charAt(4) != unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+        }
+        if (continueCheck) {
+            continue;
+        }
+
+        var continueCheck = false;
+        for (j = 0; j < unordered5.length; j++) {
+            var unorderedLetter = unordered5.charAt(j);
+            if (word.charAt(4) == unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+            if (word.charAt(0) != unorderedLetter && word.charAt(1) != unorderedLetter && word.charAt(2) != unorderedLetter && word.charAt(3) != unorderedLetter) {
+                continueCheck = true;
+                break;
+            }
+        }
+        if (continueCheck) {
+            continue;
+        }
 
         var orderedCheck = true;
         for (j = 0; j < ordered.length; j++) {
@@ -88,8 +160,7 @@ function search() {
                 continue;
             }
             if (word.charAt(j) != orderedLetter) {
-                orderedCheck = false;
-                break;
+                continue;
             }
         }
         if (!orderedCheck) {
@@ -100,10 +171,10 @@ function search() {
         for (j = 0; j < excluded.length; j++) {
             var excludedLetter = excluded.charAt(j);
             if (word.indexOf(excludedLetter) != -1) {
-                excludeCheck = true;
-                break;
+                continue;
             }
         }
+
         if (excludeCheck == false) {
             displayWord(word);
         }
@@ -111,7 +182,8 @@ function search() {
 }
 
 function displayWord(word) {
-    displayWordElement.innerHTML += "<br></br>"+word;
+    console.log(word);
+//    displayWordElement.innerHTML += "<br></br>"+word;
 }
 
 </script>
