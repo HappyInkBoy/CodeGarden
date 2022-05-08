@@ -8,10 +8,14 @@
     var c = document.getElementById("game");
     var ctx = c.getContext("2d");
     
-    var t1x = 75, t1y = 75, t1angle = 0;
-    var t2x = 1270, t2y = 590, t2angle = 180;
+    var t1x = 75, t1y = 75, t1angle = Math.PI / 4;
+    var t2x = 1270, t2y = 590, t2angle = Math.PI / 4;
 
-    function drawTank (x, y, angle, color1, color2, color3) {
+    function drawTank(x, y, angle, color1, color2, color3) {
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.translate(-x, -y);
+        
         ctx.fillStyle = color1;
         ctx.fillRect(x - 35 / 2, y - 60 / 2, 35, 60);
 
@@ -23,10 +27,34 @@
         ctx.arc(x, y, 13, 0, 2 * Math.PI, false);
         ctx.fill();
         ctx.stroke();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
-    drawTank (t1x, t1y, t1angle, "blue", "black", "gray");
-    drawTank (t2x, t2y, t2angle, "red", "black", "gray");
+    function draw() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        drawTank (t1x, t1y, t1angle, "blue", "black", "gray");
+        drawTank (t2x, t2y, t2angle, "red", "black", "gray");
+        requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+
+    document.addEventListener('keydown', keyDown);
+
+    function keyDown(e) {
+        if (e.key == 'a') {
+            t1angle -= 0.1;
+        }
+        if (e.key == 'd') {
+            t1angle += 0.1;
+        }
+        if (e.key == 'ArrowLeft') {
+            t2angle -= 0.1;
+        }
+        if (e.key == 'ArrowRight') {
+            t2angle += 0.1;
+        }
+    }
 
 </script>
 </html>
