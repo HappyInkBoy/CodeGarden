@@ -7,54 +7,107 @@
 <script>
     var c = document.getElementById("game");
     var ctx = c.getContext("2d");
-    
-    var t1x = 75, t1y = 75, t1angle = Math.PI / 4;
-    var t2x = 1270, t2y = 590, t2angle = Math.PI / 4;
+    var VELOCITY = 0.2;
 
-    function drawTank(x, y, angle, color1, color2, color3) {
-        ctx.translate(x, y);
-        ctx.rotate(angle);
-        ctx.translate(-x, -y);
+    var tank1 = {
+        x: 75,
+        y: 75,
+        angle: Math.PI / 4,
+        rotation:"none",
+        speed: 0,
+        color1: "blue",
+        color2: "black",
+        color3: "gray"
+    };
+
+    var tank2 = {
+        x: 1270,
+        y: 590,
+        angle: Math.PI / 4,
+        rotation: "none",
+        color1: "red",
+        color2: "black",
+        color3: "gray"
+    };
+
+    function drawTank(tank, delta) {
+        if (tank.rotate == "anticlock") {
+            tank.angle -= delta * 0.005;
+        }
+        if (tank.rotate == "clock") {
+            tank.angle += delta * 0.005;
+        }
+        tank.x = tank.x + tank.speed * delta * Math.cos(tank.angle);
+        tank.y = tank.y + tank.speed * delta * Math.sin(tank.angle);
+
+        ctx.translate(tank.x, tank.y);
+        ctx.rotate(tank.angle - 3 * Math.PI / 4);
+        ctx.translate(-tank.x, -tank.y);
         
-        ctx.fillStyle = color1;
-        ctx.fillRect(x - 35 / 2, y - 60 / 2, 35, 60);
+        ctx.fillStyle = tank.color1;
+        ctx.fillRect(tank.x - 35 / 2, tank.y - 60 / 2, 35, 60);
 
-        ctx.fillStyle = color2;
-        ctx.fillRect(x - 5, y, 10, 40);
+        ctx.fillStyle = tank.color2;
+        ctx.fillRect(tank.x - 5, tank.y, 10, 40);
 
         ctx.beginPath();
-        ctx.fillStyle = color3;
-        ctx.arc(x, y, 13, 0, 2 * Math.PI, false);
+        ctx.fillStyle = tank.color3;
+        ctx.arc(tank.x, tank.y, 13, 0, 2 * Math.PI, false);
         ctx.fill();
         ctx.stroke();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
-    function draw() {
+    var previous = 0;
+    function draw(now) {
+        var delta = now - previous;
         ctx.clearRect(0, 0, c.width, c.height);
-        drawTank (t1x, t1y, t1angle, "blue", "black", "gray");
-        drawTank (t2x, t2y, t2angle, "red", "black", "gray");
+        drawTank (tank1, delta);
+        drawTank (tank2, delta);
+        previous = now;
         requestAnimationFrame(draw);
     }
 
     requestAnimationFrame(draw);
 
     document.addEventListener('keydown', keyDown);
+    document.addEventListener('keyup', keyUp);
 
     function keyDown(e) {
+        if (e.repeat) {
+            return;
+        }
         if (e.key == 'a') {
-            t1angle -= 0.1;
+            tank1.rotate = "anticlock";
         }
         if (e.key == 'd') {
-            t1angle += 0.1;
+            tank1.rotate = "clock";
         }
         if (e.key == 'ArrowLeft') {
-            t2angle -= 0.1;
+            tank2.angle -= 0.1;
         }
         if (e.key == 'ArrowRight') {
-            t2angle += 0.1;
+            tank2.angle += 0.1;
+        }
+        if (e.key == 'w') {
+            tank1.speed = VELOCITY;
         }
     }
+
+    function keyUp(e) {
+        if (e.repeat) {
+            return;
+        };
+        if (e.key == 'w') {
+            tank1.speed = 0;
+        };
+        if (e.key == 'a') {
+            tank1.rotate = "none";
+        };
+        if (e.key == 'd') {
+            tank1.rotate = "none";
+        };
+    };
 
 </script>
 </html>
