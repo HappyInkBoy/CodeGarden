@@ -8,6 +8,7 @@
     var c = document.getElementById("game");
     var ctx = c.getContext("2d");
     var VELOCITY = 0.2;
+    var VELOCITY_BACK = 0.1;
 
     var tank1 = {
         x: 75,
@@ -23,8 +24,9 @@
     var tank2 = {
         x: 1270,
         y: 590,
-        angle: Math.PI / 4,
+        angle: 0,
         rotation: "none",
+        speed: 0,
         color1: "red",
         color2: "black",
         color3: "gray"
@@ -83,14 +85,23 @@
         if (e.key == 'd') {
             tank1.rotate = "clock";
         }
-        if (e.key == 'ArrowLeft') {
-            tank2.angle -= 0.1;
-        }
-        if (e.key == 'ArrowRight') {
-            tank2.angle += 0.1;
-        }
         if (e.key == 'w') {
             tank1.speed = VELOCITY;
+        }
+        if (e.key == 's') {
+            tank1.speed = -VELOCITY_BACK;
+        }
+        if (e.key == 'ArrowLeft') {
+            tank2.rotate = "anticlock";
+        }
+        if (e.key == 'ArrowRight') {
+            tank2.rotate = "clock";
+        }
+        if (e.key == 'ArrowUp') {
+            tank2.speed = VELOCITY;
+        }
+        if (e.key == 'ArrowDown') {
+            tank2.speed = -VELOCITY_BACK;
         }
     }
 
@@ -101,11 +112,26 @@
         if (e.key == 'w') {
             tank1.speed = 0;
         };
+        if (e.key == 's') {
+            tank1.speed = 0;
+        }
         if (e.key == 'a') {
             tank1.rotate = "none";
         };
         if (e.key == 'd') {
             tank1.rotate = "none";
+        };
+        if (e.key == 'ArrowUp') {
+            tank2.speed = 0;
+        };
+        if (e.key == 'ArrowDown') {
+            tank2.speed = 0;
+        }
+        if (e.key == 'ArrowLeft') {
+            tank2.rotate = "none";
+        };
+        if (e.key == 'ArrowRight') {
+            tank2.rotate = "none";
         };
     };
 
