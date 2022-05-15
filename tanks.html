@@ -12,7 +12,7 @@
     var tank1 = {
         x: 75,
         y: 75,
-        angle: Math.PI / 4,
+        angle: 0,
         rotation:"none",
         speed: 0,
         color1: "blue",
@@ -41,7 +41,7 @@
         tank.y = tank.y + tank.speed * delta * Math.sin(tank.angle);
 
         ctx.translate(tank.x, tank.y);
-        ctx.rotate(tank.angle - 3 * Math.PI / 4);
+        ctx.rotate(tank.angle-Math.PI/2);
         ctx.translate(-tank.x, -tank.y);
         
         ctx.fillStyle = tank.color1;
