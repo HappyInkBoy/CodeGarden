@@ -12,6 +12,9 @@
 
     var walls = [
         { type: "wall", x: 0, y: 0, width: 1345, height: 10},
+        { type: "wall", x: 0, y: 0, width: 10, height: 665},
+        { type: "wall", x: 0, y: 655, width: 1345, height: 10},
+        { type: "wall", x: 1335, y: 0, width: 10, height: 665},
         { type: "wall", x: 1345/2, y: 100, width: 10, height: 665-200}
     ];
 
@@ -103,6 +106,18 @@
                 tank.y = newY;
             }
         }
+        var now = Date.now();
+        var removeIndex = -1;
+        for (i = 0; i < bullets.length; i++) {
+            var bullet = bullets[i];
+            if (now > bullet.creationTime + 2500) {
+                removeIndex = i;
+                break;
+            }
+        }
+        if (removeIndex >= 0) {
+            bullets.splice(removeIndex, 1);
+        }
         for (i = 0; i < bullets.length; i++) {
             var bullet = bullets[i];
             var newX = bullet.x + bullet.speed * delta * Math.cos(bullet.angle);
@@ -175,7 +190,10 @@
             tank2.speed = -VELOCITY_BACK;
         }
         if (e.key == 'x') {
-            bullets.push( { type: "bullet", x: tank1.x, y: tank1.y, radius: 10, angle: tank1.angle, speed: 1});
+            bullets.push( { type: "bullet", x: tank1.x, y: tank1.y, radius: 10, angle: tank1.angle, speed: 0.4, creationTime: Date.now()});
+        }
+        if (e.key == 'm') {
+            bullets.push( { type: "bullet", x: tank2.x, y: tank2.y, radius: 10, angle: tank2.angle, speed: 0.4, creationTime: Date.now()});
         }
     }
 
