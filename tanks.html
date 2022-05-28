@@ -10,6 +10,14 @@
     var VELOCITY = 0.2;
     var VELOCITY_BACK = 0.1;
 
+    var walls = [
+        { type: "wall", x: 0, y: 0, width: 1345, height: 10},
+        { type: "wall", x: 1345/2, y: 100, width: 10, height: 665-200}
+    ];
+
+    var bullets = [];
+
+
     var tank1 = {
         x: 75,
         y: 75,
@@ -32,16 +40,33 @@
         color3: "gray"
     };
 
-    function drawTank(tank, delta) {
-        if (tank.rotate == "anticlock") {
-            tank.angle -= delta * 0.005;
-        }
-        if (tank.rotate == "clock") {
-            tank.angle += delta * 0.005;
-        }
-        tank.x = tank.x + tank.speed * delta * Math.cos(tank.angle);
-        tank.y = tank.y + tank.speed * delta * Math.sin(tank.angle);
+    var tanks = [ tank1, tank2 ];
 
+    function hit(x,y,radius) {
+        for (var i = 0; i < walls.length; i++) {
+            var wall = walls[i];
+            if (x+radius >= wall.x && x-radius < wall.x + wall.width && y+radius >= wall.y && y-radius < wall.y + wall.height) {
+                return wall;
+            }           
+        }
+        return null;
+    }
+
+    function drawBullets() {
+        ctx.fillStyle = "red";
+        bullets.forEach(function(bullet) {
+            ctx.fillRect(bullet.x - bullet.radius, bullet.y - bullet.radius, bullet.radius * 2, bullet.radius * 2);
+        });
+    }
+
+    function drawWalls() {
+        ctx.fillStyle = "black";
+        walls.forEach(function(wall) {
+            ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+        });
+    }
+
+    function drawTank(tank) {
         ctx.translate(tank.x, tank.y);
         ctx.rotate(tank.angle-Math.PI/2);
         ctx.translate(-tank.x, -tank.y);
@@ -60,12 +85,58 @@
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
+    function updateSprites(delta) {
+        var i;
+        for (i = 0; i < tanks.length; i++) {
+            var tank = tanks[i];
+            if (tank.rotate == "anticlock") {
+                tank.angle -= delta * 0.005;
+            }
+            if (tank.rotate == "clock") {
+                tank.angle += delta * 0.005;
+            }
+            var newX = tank.x + tank.speed * delta * Math.cos(tank.angle);
+            var newY = tank.y + tank.speed * delta * Math.sin(tank.angle);
+
+            if (!hit(newX, newY, 20)) {
+                tank.x = newX;
+                tank.y = newY;
+            }
+        }
+        for (i = 0; i < bullets.length; i++) {
+            var bullet = bullets[i];
+            var newX = bullet.x + bullet.speed * delta * Math.cos(bullet.angle);
+            var newY = bullet.y + bullet.speed * delta * Math.sin(bullet.angle);
+            var sprite = hit(newX, newY, bullet.radius);
+            if (sprite && sprite.type == "wall") {
+                // vertical or horizontal?
+                if (sprite.width == 10) {
+                    // vertical
+                    bullet.angle = bullet.angle % (Math.PI * 2);
+                    bullet.angle += Math.PI / 2;
+                }
+                if (sprite.height == 10) {
+                    // horizontal
+                    bullet.angle = bullet.angle % (Math.PI * 2);
+                    bullet.angle += Math.PI / 2;
+                }
+            }
+            if (!sprite) {
+                bullet.x = newX;
+                bullet.y = newY;
+            }
+        }
+    }
+
     var previous = 0;
     function draw(now) {
         var delta = now - previous;
+        updateSprites(delta);
         ctx.clearRect(0, 0, c.width, c.height);
-        drawTank (tank1, delta);
-        drawTank (tank2, delta);
+        drawWalls();
+        drawTank (tank1);
+        drawTank (tank2);
+        drawBullets();
         previous = now;
         requestAnimationFrame(draw);
     }
@@ -102,6 +173,9 @@
         }
         if (e.key == 'ArrowDown') {
             tank2.speed = -VELOCITY_BACK;
+        }
+        if (e.key == 'x') {
+            bullets.push( { type: "bullet", x: tank1.x, y: tank1.y, radius: 10, angle: tank1.angle, speed: 1});
         }
     }
 
