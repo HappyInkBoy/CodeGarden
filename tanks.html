@@ -124,16 +124,14 @@
             var newY = bullet.y + bullet.speed * delta * Math.sin(bullet.angle);
             var sprite = hit(newX, newY, bullet.radius);
             if (sprite && sprite.type == "wall") {
-                // vertical or horizontal?
+                bullet.angle = bullet.angle % (Math.PI * 2);
                 if (sprite.width == 10) {
-                    // vertical
-                    bullet.angle = bullet.angle % (Math.PI * 2);
-                    bullet.angle += Math.PI / 2;
+                    // bouncing a vertical wall
+                    bullet.angle = Math.PI - bullet.angle;
                 }
                 if (sprite.height == 10) {
-                    // horizontal
-                    bullet.angle = bullet.angle % (Math.PI * 2);
-                    bullet.angle += Math.PI / 2;
+                    // bouncingg an horizontal wall
+                    bullet.angle = -bullet.angle;
                 }
             }
             if (!sprite) {
