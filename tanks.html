@@ -29,7 +29,8 @@
         speed: 0,
         color1: "blue",
         color2: "black",
-        color3: "gray"
+        color3: "gray",
+        dead: false
     };
 
     var tank2 = {
@@ -40,7 +41,8 @@
         speed: 0,
         color1: "red",
         color2: "black",
-        color3: "gray"
+        color3: "gray",
+        dead: false
     };
 
     var tanks = [ tank1, tank2 ];
@@ -54,11 +56,24 @@
         }
         return null;
     }
+    function bulletHitTank (bullet, tank) {
+        if (Date.now() - bullet.creationTime < 300) {
+            return false;
+        }
+        if (bullet.x + bullet.radius >= tank.x - 35 && bullet.x - bullet.radius < tank.x + 35 &&
+        bullet.y + bullet.radius >= tank.y - 35 && bullet.y - bullet.radius < tank.y + 35) {
+            return true;
+        }
+        return false;
+    }
 
     function drawBullets() {
         ctx.fillStyle = "red";
         bullets.forEach(function(bullet) {
-            ctx.fillRect(bullet.x - bullet.radius, bullet.y - bullet.radius, bullet.radius * 2, bullet.radius * 2);
+//            ctx.fillRect(bullet.x - bullet.radius, bullet.y - bullet.radius, bullet.radius * 2, bullet.radius * 2);
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, bullet.radius, 0, 2 * Math.PI, false);
+            ctx.fill();
         });
     }
 
@@ -75,6 +90,9 @@
         ctx.translate(-tank.x, -tank.y);
         
         ctx.fillStyle = tank.color1;
+        if (tank.dead) {
+            ctx.fillStyle = "black";
+        }
         ctx.fillRect(tank.x - 35 / 2, tank.y - 60 / 2, 35, 60);
 
         ctx.fillStyle = tank.color2;
@@ -90,6 +108,20 @@
 
     function updateSprites(delta) {
         var i;
+        for (i = 0; i < bullets.length; i++) {
+            var bullet = bullets[i];
+            if (bulletHitTank(bullet, tank1)) {
+                tank1.dead = true;
+                bullets[i] = null;
+            }
+            if (bulletHitTank(bullet, tank2)) {
+                tank2.dead = true;
+                bullets[i] = null;
+            }
+        }
+        bullets = bullets.filter(element => {
+            return element !== null;
+            });
         for (i = 0; i < tanks.length; i++) {
             var tank = tanks[i];
             if (tank.rotate == "anticlock") {
@@ -110,7 +142,7 @@
         var removeIndex = -1;
         for (i = 0; i < bullets.length; i++) {
             var bullet = bullets[i];
-            if (now > bullet.creationTime + 2500) {
+            if (now > bullet.creationTime + 5000) {
                 removeIndex = i;
                 break;
             }
@@ -187,11 +219,35 @@
         if (e.key == 'ArrowDown') {
             tank2.speed = -VELOCITY_BACK;
         }
-        if (e.key == 'x') {
-            bullets.push( { type: "bullet", x: tank1.x, y: tank1.y, radius: 10, angle: tank1.angle, speed: 0.4, creationTime: Date.now()});
+        if (e.key == 'r') {
+            if (tank1.dead) {
+                return;
+            }
+            var i;
+            var cnt = 0;
+            for (i=0; i<bullets.length; i++) {
+                if (bullets[i].tank == tank1) {
+                    cnt++;
+                }
+            }
+            if (cnt < 5) {
+                bullets.push( { type: "bullet", x: tank1.x, y: tank1.y, radius: 10, angle: tank1.angle, speed: 0.4, creationTime: Date.now(), tank: tank1});
+            }
         }
         if (e.key == 'm') {
-            bullets.push( { type: "bullet", x: tank2.x, y: tank2.y, radius: 10, angle: tank2.angle, speed: 0.4, creationTime: Date.now()});
+            if (tank2.dead) {
+                return;
+            }
+            var i;
+            var cnt = 0;
+            for (i=0; i<bullets.length; i++) {
+                if (bullets[i].tank == tank2) {
+                    cnt++;
+                }
+            }
+            if (cnt < 5) {
+                bullets.push( { type: "bullet", x: tank2.x, y: tank2.y, radius: 10, angle: tank2.angle, speed: 0.4, creationTime: Date.now(), tank: tank2});
+            }
         }
     }
 
