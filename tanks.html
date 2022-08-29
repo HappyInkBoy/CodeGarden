@@ -10,12 +10,16 @@
     var VELOCITY = 0.2;
     var VELOCITY_BACK = 0.1;
 
+// The +10 in the 665-335+10 is meant to make the wall symetrical since the height of the vertical wall is meant to replace that number
     var walls = [
         { type: "wall", x: 0, y: 0, width: 1345, height: 10},
         { type: "wall", x: 0, y: 0, width: 10, height: 665},
         { type: "wall", x: 0, y: 655, width: 1345, height: 10},
         { type: "wall", x: 1335, y: 0, width: 10, height: 665},
-        { type: "wall", x: 1345/2, y: 100, width: 10, height: 665-200}
+        { type: "wall", x: 1345/2, y: 100, width: 10, height: 665-500},
+        { type: "wall", x: 1345/2, y: 400, width: 10, height: 665-500},
+        { type: "wall", x: 1345/2-165, y: 100, width: 665-335+10, height: 10},
+        { type: "wall", x: 1345/2-165, y: 565, width: 665-335+10, height: 10}
     ];
 
     var bullets = [];
