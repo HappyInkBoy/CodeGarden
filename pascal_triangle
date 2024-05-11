@@ -1,0 +1,177 @@
+inputed_binomial = input("Input your binomial in the format of (cx+ky)^e: ")
+# PC validations maybe
+split_binomial = inputed_binomial.split("^")
+exponent = int(split_binomial[1])
+
+def produce_pascal_triangle(exponent):
+  pascal_triangle = [[1]]
+
+  for i in range(0,exponent):
+    next_row = [1]
+    for x in range(1,i+1):
+      next_element = pascal_triangle[i][x] + pascal_triangle[i][x-1]
+      next_row.append(next_element)
+    next_row.append(1)
+    pascal_triangle.append(next_row)
+  return pascal_triangle
+
+pascal_triangle = produce_pascal_triangle(exponent)
+
+for i in pascal_triangle:
+  print(i)
+
+last_row = pascal_triangle[exponent]
+# This list is later used as the coefficients in binomial expansion
+
+split_binomial[0] = split_binomial[0].replace('(', '')
+split_binomial[0] = split_binomial[0].replace(')', '')
+# Removes the parentheses
+
+print(split_binomial)
+# At this point:
+# "cx+ky","e"
+
+if "-" not in split_binomial[0]:
+  terms = split_binomial[0].split("+")
+  print(terms)
+  # At this point:
+  # "cx","ky","e"
+
+  # This is where the program will have to identify what kind of binomial was inputed
+  term1_has_variable = False
+  for l in terms[0]:
+    if l.isalpha() == True:
+      term1_has_variable = True
+  # Checks if term 1 has any variables
+  term2_has_variable = False
+  for l in terms[1]:
+    if l.isalpha() == True:
+      term2_has_variable = True
+
+  print(term1_has_variable, term2_has_variable)
+
+  if term1_has_variable == True and term2_has_variable == True:
+    binomial_type = "double_variable"
+    if terms[0][len(terms[0])-1] == terms[1][len(terms[1])-1]:
+      # Checks if the two variables on each side are actually just the same variable
+      binomial_type = "simple_single_variable"
+  elif term1_has_variable == True and term2_has_variable == False:
+    binomial_type = "first_single_variable"
+  elif term1_has_variable == False and term2_has_variable == True:
+    binomial_type = "second_single_variable"
+  elif term1_has_variable == False and term2_has_variable == False:
+    binomial_type = "no_variable"
+  # These if statements are making a variable that stores what kind of binomial was inputed
+  print(binomial_type)
+elif "-" in split_binomial[0] and "+" in split_binomial[0]:
+  terms = split_binomial[0].split("+")
+  print(terms)
+  # At this point:
+  # "cx","ky","e"
+
+  # This is where the program will have to identify what kind of binomial was inputed
+  term1_has_variable = False
+  for l in terms[0]:
+    if l.isalpha() == True:
+      term1_has_variable = True
+  # Checks if term 1 has any variables
+  term2_has_variable = False
+  for l in terms[1]:
+    if l.isalpha() == True:
+      term2_has_variable = True
+
+  print(term1_has_variable, term2_has_variable)
+
+  if term1_has_variable == True and term2_has_variable == True:
+    binomial_type = "double_variable"
+    if terms[0][len(terms[0])-1] == terms[1][len(terms[1])-1]:
+      # Checks if the two variables on each side are actually just the same variable
+      binomial_type = "simple_single_variable"
+  elif term1_has_variable == True and term2_has_variable == False:
+    binomial_type = "first_single_variable"
+  elif term1_has_variable == False and term2_has_variable == True:
+    binomial_type = "second_single_variable"
+  elif term1_has_variable == False and term2_has_variable == False:
+    binomial_type = "no_variable"
+  # These if statements are making a variable that stores what kind of binomial was inputed
+  print(binomial_type)
+elif "-" in split_binomial[0]:
+  terms = split_binomial[0].split("-")
+  if len(terms) == 3:
+    """
+    The reason why I check for a length of 3 is because if you split the binomial that has two negative signs, it will produce a list with three elements
+    The first element in that list would be an empty string "" because when the split function has two thigns to split, it will split the string into three elements
+    """
+    # The binomial has 2 negative coefficients
+    
+  elif len(terms) == 2:
+    # The binomial has 1 negative coefficient
+    print("This part is not done")
+
+def improve_exponent(exponent):
+  # This function is just for taking a string that would be used as an exponent and making it have superscript characters instead
+  new_exponent = ""
+  for i in str(exponent):
+    if i == "0":
+      new_exponent = new_exponent + "⁰"
+    elif i == "1":
+      new_exponent = new_exponent + "¹"
+    elif i == "2":
+      new_exponent = new_exponent + "²"
+    elif i == "3":
+      new_exponent = new_exponent + "³"
+    elif i == "4":
+      new_exponent = new_exponent + "⁴"
+    elif i == "5":
+      new_exponent = new_exponent + "⁵"
+    elif i == "6":
+      new_exponent = new_exponent + "⁶"
+    elif i == "7":
+      new_exponent = new_exponent + "⁷"
+    elif i == "8":
+      new_exponent = new_exponent + "⁸"
+    elif i == "9":
+      new_exponent = new_exponent + "⁹"
+  return new_exponent
+
+def simplify_easy_binomial():
+  coefficient1 = terms[0].replace(terms[0][len(terms[0])-1], '')
+  if coefficient1 == "":
+    coefficient1 = "1"
+  elif coefficient1 == "-":
+    coefficient1 = "-1"
+  coefficient2 = terms[1].replace(terms[1][len(terms[1])-1], '')
+  if coefficient2 == "":
+    coefficient2 = "1"
+  variable = terms[0][len(terms[0])-1]
+  # Seperates the coefficients from the variables
+  print(coefficient1, coefficient2, variable)
+  better_exponent = improve_exponent(exponent)
+  final_coefficient = str((int(coefficient1) + int(coefficient2))**int(exponent))
+  if final_coefficient == "0":
+    print(f"Expanded binomial: {final_coefficient}")
+  else:
+    print(f"Expanded binomial: {final_coefficient}{variable}{better_exponent}")
+
+if binomial_type == "simple_single_variable":
+  simplify_easy_binomial()
+
+
+
+"""
+Input:
+This is the general format of the input: (cx+ky)^e or (c+ky)^e or (cx+k)^e
+Will not accept (c+k)^e because that does not need to be expanded (there are no variables)
+e is the exponent
+c is the coefficient of x
+k is the coefficient of y
+
+The program will delete the parentheses and then split the string to isolate the exponent into a variable
+That exponent will be used to determine the # of rows in pascal's triangle and the exponents in the expanded equation
+The program will split the string through the + sign to isolate the x and y variables
+There will have to be a check to make sure that the binomial has either 2 variables or 1 variable
+There will be a for loop at the end where a list will be appended with a concatenated string that has the triangle's coefficient multiplied by the coefficients in the binomial
+
+How to use matplotlib for the 2d & 3d graphing: https://www.kaggle.com/code/imoore/2d-and-3d-plotting-tutorial-in-python
+
+"""
