@@ -31,13 +31,7 @@ print(split_binomial)
 # At this point:
 # "cx+ky","e"
 
-if "-" not in split_binomial[0]:
-  terms = split_binomial[0].split("+")
-  print(terms)
-  # At this point:
-  # "cx","ky","e"
-
-  # This is where the program will have to identify what kind of binomial was inputed
+def does_binomial_have_variables(terms):
   term1_has_variable = False
   for l in terms[0]:
     if l.isalpha() == True:
@@ -47,9 +41,9 @@ if "-" not in split_binomial[0]:
   for l in terms[1]:
     if l.isalpha() == True:
       term2_has_variable = True
+  return term1_has_variable, term2_has_variable
 
-  print(term1_has_variable, term2_has_variable)
-
+def what_kind_of_binomial(term1_has_variable, term2_has_variable):
   if term1_has_variable == True and term2_has_variable == True:
     binomial_type = "double_variable"
     if terms[0][len(terms[0])-1] == terms[1][len(terms[1])-1]:
@@ -62,51 +56,64 @@ if "-" not in split_binomial[0]:
   elif term1_has_variable == False and term2_has_variable == False:
     binomial_type = "no_variable"
   # These if statements are making a variable that stores what kind of binomial was inputed
+  return binomial_type
+
+if "-" not in split_binomial[0]:
+  binomial_sign = "positive"
+  terms = split_binomial[0].split("+")
+  print(terms)
+  # At this point:
+  # "cx","ky","e"
+
+  # This is where the program will have to identify what kind of binomial was inputed
+  term1_has_variable = does_binomial_have_variables(terms)[0]
+  term2_has_variable = does_binomial_have_variables(terms)[1]
+
+  binomial_type = what_kind_of_binomial(term1_has_variable, term2_has_variable)
+
+  print(term1_has_variable, term2_has_variable)
+
   print(binomial_type)
 elif "-" in split_binomial[0] and "+" in split_binomial[0]:
+  binomial_sign = "left_negative"
   terms = split_binomial[0].split("+")
   print(terms)
   # At this point:
   # "cx","ky","e"
 
   # This is where the program will have to identify what kind of binomial was inputed
-  term1_has_variable = False
-  for l in terms[0]:
-    if l.isalpha() == True:
-      term1_has_variable = True
-  # Checks if term 1 has any variables
-  term2_has_variable = False
-  for l in terms[1]:
-    if l.isalpha() == True:
-      term2_has_variable = True
+  term1_has_variable = does_binomial_have_variables(terms)[0]
+  term2_has_variable = does_binomial_have_variables(terms)[1]
 
   print(term1_has_variable, term2_has_variable)
 
-  if term1_has_variable == True and term2_has_variable == True:
-    binomial_type = "double_variable"
-    if terms[0][len(terms[0])-1] == terms[1][len(terms[1])-1]:
-      # Checks if the two variables on each side are actually just the same variable
-      binomial_type = "simple_single_variable"
-  elif term1_has_variable == True and term2_has_variable == False:
-    binomial_type = "first_single_variable"
-  elif term1_has_variable == False and term2_has_variable == True:
-    binomial_type = "second_single_variable"
-  elif term1_has_variable == False and term2_has_variable == False:
-    binomial_type = "no_variable"
-  # These if statements are making a variable that stores what kind of binomial was inputed
+  binomial_type = what_kind_of_binomial(term1_has_variable, term2_has_variable)
   print(binomial_type)
 elif "-" in split_binomial[0]:
   terms = split_binomial[0].split("-")
+  print(terms)
   if len(terms) == 3:
+    binomial_sign = "double_negative"
     """
     The reason why I check for a length of 3 is because if you split the binomial that has two negative signs, it will produce a list with three elements
     The first element in that list would be an empty string "" because when the split function has two thigns to split, it will split the string into three elements
     """
     # The binomial has 2 negative coefficients
-    
+    terms.pop(0)
+
+    term1_has_variable = does_binomial_have_variables(terms)[0]
+    term2_has_variable = does_binomial_have_variables(terms)[1]
+    binomial_type = what_kind_of_binomial(term1_has_variable, term2_has_variable)
+    print(binomial_type)
   elif len(terms) == 2:
     # The binomial has 1 negative coefficient
-    print("This part is not done")
+    binomial_sign = "right_negative"
+    
+    term1_has_variable = does_binomial_have_variables(terms)[0]
+    term2_has_variable = does_binomial_have_variables(terms)[1]
+
+    binomial_type = what_kind_of_binomial(term1_has_variable, term2_has_variable)
+    print(binomial_type)
 
 def improve_exponent(exponent):
   # This function is just for taking a string that would be used as an exponent and making it have superscript characters instead
@@ -134,7 +141,7 @@ def improve_exponent(exponent):
       new_exponent = new_exponent + "⁹"
   return new_exponent
 
-def simplify_easy_binomial():
+def simplify_easy_binomial(terms, exponent, binomial_sign):
   coefficient1 = terms[0].replace(terms[0][len(terms[0])-1], '')
   if coefficient1 == "":
     coefficient1 = "1"
@@ -147,14 +154,19 @@ def simplify_easy_binomial():
   # Seperates the coefficients from the variables
   print(coefficient1, coefficient2, variable)
   better_exponent = improve_exponent(exponent)
-  final_coefficient = str((int(coefficient1) + int(coefficient2))**int(exponent))
+  if binomial_sign == "double_negative":
+    final_coefficient = str((-1*(int(coefficient1) + int(coefficient2)))**int(exponent))
+  elif binomial_sign == "right_negative":
+    final_coefficient = str((int(coefficient1) - int(coefficient2))**int(exponent))
+  else:
+    final_coefficient = str((int(coefficient1) + int(coefficient2))**int(exponent))
   if final_coefficient == "0":
     print(f"Expanded binomial: {final_coefficient}")
   else:
     print(f"Expanded binomial: {final_coefficient}{variable}{better_exponent}")
 
 if binomial_type == "simple_single_variable":
-  simplify_easy_binomial()
+  simplify_easy_binomial(terms, exponent, binomial_sign)
 
 
 
