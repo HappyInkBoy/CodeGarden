@@ -3,6 +3,7 @@ inputed_binomial = input("Input your binomial in the format of (cx+ky)^e: ")
 split_binomial = inputed_binomial.split("^")
 exponent = int(split_binomial[1])
 
+
 def produce_pascal_triangle(exponent):
   pascal_triangle = [[1]]
 
@@ -23,10 +24,13 @@ for i in pascal_triangle:
 last_row = pascal_triangle[exponent]
 # This list is later used as the coefficients in binomial expansion
 
+# Just to simplify the string by removing unessecary symbols and characters
 split_binomial[0] = split_binomial[0].replace('(', '')
 split_binomial[0] = split_binomial[0].replace(')', '')
-# Removes the parentheses
-
+# The 1 in the argument simply means that the replace() function will only replace the + sign once
+# This is done to prevent the other + sign from being replaced
+if split_binomial[0][0] == "+":
+  split_binomial[0] = split_binomial[0].replace('+', '', 1)
 print(split_binomial)
 # At this point:
 # "cx+ky","e"
@@ -108,7 +112,7 @@ elif "-" in split_binomial[0]:
   elif len(terms) == 2:
     # The binomial has 1 negative coefficient
     binomial_sign = "right_negative"
-    
+
     term1_has_variable = does_binomial_have_variables(terms)[0]
     term2_has_variable = does_binomial_have_variables(terms)[1]
 
@@ -161,15 +165,73 @@ def simplify_easy_binomial(terms, exponent, binomial_sign):
   else:
     final_coefficient = str((int(coefficient1) + int(coefficient2))**int(exponent))
   if final_coefficient == "0":
-    print(f"Expanded binomial: {final_coefficient}")
+    expanded_binomial = final_coefficient
   else:
-    print(f"Expanded binomial: {final_coefficient}{variable}{better_exponent}")
+    expanded_binomial = final_coefficient + variable + better_exponent
+  return expanded_binomial
+
+def double_unique_variables(terms, exponent, binomial_sign, last_row):
+  coefficient1 = terms[0].replace(terms[0][len(terms[0])-1], '')
+  if coefficient1 == "":
+    coefficient1 = "1"
+  elif coefficient1 == "-":
+    coefficient1 = "-1"
+  coefficient2 = terms[1].replace(terms[1][len(terms[1])-1], '')
+  if coefficient2 == "":
+    coefficient2 = "1"
+  variable1 = terms[0][len(terms[0])-1]
+  variable2 = terms[1][len(terms[1])-1]
+
+  print(coefficient1, variable1, coefficient2, variable2)
+
+  expanded_binomial = []
+  # Start the binomial expansion with a pure positive binomial to make things simple
+  for i in range(0,len(last_row)):
+    triangle_coefficient = last_row[i]
+    # Determines the coefficient of this term in the expanded form
+    if binomial_sign == "double_negative":
+      exponentiated_coefficient1 = (-1*int(coefficient1)) ** (len(last_row)-1-i)
+    else:
+      exponentiated_coefficient1 = int(coefficient1) ** (len(last_row)-1-i)
+    if binomial_sign == "right_negative" or binomial_sign == "double_negative":
+      exponentiated_coefficient2 = (-1*int(coefficient2)) ** i
+    else:
+      exponentiated_coefficient2 = int(coefficient2) ** i
+    term_coefficient = str(triangle_coefficient * exponentiated_coefficient1 * exponentiated_coefficient2)
+    if term_coefficient == "1":
+      term_coefficient = ""
+    exponentiated_variable1 = variable1 + improve_exponent((len(last_row)-1-i))
+    exponentiated_variable2 = variable2 + improve_exponent(i)
+    if improve_exponent(i) == "⁰":
+      exponentiated_variable2 = ""
+    elif improve_exponent(i) == "¹":
+      exponentiated_variable2 = variable2
+    if improve_exponent((len(last_row)-1-i)) == "⁰":
+      exponentiated_variable1 = ""
+    elif improve_exponent((len(last_row)-1-i)) == "¹":
+      exponentiated_variable1 = variable1
+    expanded_term = term_coefficient + exponentiated_variable1 + exponentiated_variable2
+    expanded_binomial.append(expanded_term)
+  return expanded_binomial
+
+  
 
 if binomial_type == "simple_single_variable":
-  simplify_easy_binomial(terms, exponent, binomial_sign)
+  expanded_binomial = simplify_easy_binomial(terms, exponent, binomial_sign)
+elif binomial_type == "double_variable":
+  expanded_binomial = double_unique_variables(terms, exponent, binomial_sign, last_row)
 
 
-
+# This is not complete. It needs to be able to deal with negatives and it cannot be used if binomial type is simple single variable
+final_expanded_binomial = ""
+for i in range(0,len(expanded_binomial)):
+  if binomial_sign == "positive":
+    if i < len(expanded_binomial)-1:
+      final_expanded_binomial = final_expanded_binomial + expanded_binomial[i] + " " + "+" + " "
+    else:
+      final_expanded_binomial = final_expanded_binomial + expanded_binomial[i]
+  
+print(final_expanded_binomial)
 """
 Input:
 This is the general format of the input: (cx+ky)^e or (c+ky)^e or (cx+k)^e
