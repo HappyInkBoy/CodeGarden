@@ -212,6 +212,7 @@ def double_unique_variables(terms, exponent, binomial_sign, last_row):
       exponentiated_variable1 = variable1
     expanded_term = term_coefficient + exponentiated_variable1 + exponentiated_variable2
     expanded_binomial.append(expanded_term)
+  print(expanded_binomial)
   return expanded_binomial
 
   
@@ -222,16 +223,19 @@ elif binomial_type == "double_variable":
   expanded_binomial = double_unique_variables(terms, exponent, binomial_sign, last_row)
 
 
-# This is not complete. It needs to be able to deal with negatives and it cannot be used if binomial type is simple single variable
+
 final_expanded_binomial = ""
 for i in range(0,len(expanded_binomial)):
-  if binomial_sign == "positive":
-    if i < len(expanded_binomial)-1:
-      final_expanded_binomial = final_expanded_binomial + expanded_binomial[i] + " " + "+" + " "
-    else:
-      final_expanded_binomial = final_expanded_binomial + expanded_binomial[i]
+  # The i+1 is done so that the loop will check if the next term is negative or positive and it will concatenate either a - sign or a + sign
+  if i == 0:
+    final_expanded_binomial = final_expanded_binomial + expanded_binomial[0]
+  elif expanded_binomial[i][0] == "-":
+    output_term = expanded_binomial[i].replace('-', '')
+    final_expanded_binomial = final_expanded_binomial + " " + "-" + " " + output_term
+  elif expanded_binomial[i][0] != "-":
+    final_expanded_binomial = final_expanded_binomial + " " + "+" + " " + expanded_binomial[i]
   
-print(final_expanded_binomial)
+print(f"Expanded binomial: {final_expanded_binomial}")
 """
 Input:
 This is the general format of the input: (cx+ky)^e or (c+ky)^e or (cx+k)^e
