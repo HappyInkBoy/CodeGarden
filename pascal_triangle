@@ -156,7 +156,6 @@ def simplify_easy_binomial(terms, exponent, binomial_sign):
     coefficient2 = "1"
   variable = terms[0][len(terms[0])-1]
   # Seperates the coefficients from the variables
-  print(coefficient1, coefficient2, variable)
   better_exponent = improve_exponent(exponent)
   if binomial_sign == "double_negative":
     final_coefficient = str((-1*(int(coefficient1) + int(coefficient2)))**int(exponent))
@@ -182,13 +181,11 @@ def double_unique_variables(terms, exponent, binomial_sign, last_row):
   variable1 = terms[0][len(terms[0])-1]
   variable2 = terms[1][len(terms[1])-1]
 
-  print(coefficient1, variable1, coefficient2, variable2)
-
   expanded_binomial = []
   # Start the binomial expansion with a pure positive binomial to make things simple
   for i in range(0,len(last_row)):
     triangle_coefficient = last_row[i]
-    # Determines the coefficient of this term in the expanded form
+    # Finds the coefficient of this term in expanded form
     if binomial_sign == "double_negative":
       exponentiated_coefficient1 = (-1*int(coefficient1)) ** (len(last_row)-1-i)
     else:
@@ -200,6 +197,8 @@ def double_unique_variables(terms, exponent, binomial_sign, last_row):
     term_coefficient = str(triangle_coefficient * exponentiated_coefficient1 * exponentiated_coefficient2)
     if term_coefficient == "1":
       term_coefficient = ""
+    elif term_coefficient == "-1":
+      term_coefficient = "-"
     exponentiated_variable1 = variable1 + improve_exponent((len(last_row)-1-i))
     exponentiated_variable2 = variable2 + improve_exponent(i)
     if improve_exponent(i) == "⁰":
@@ -212,29 +211,99 @@ def double_unique_variables(terms, exponent, binomial_sign, last_row):
       exponentiated_variable1 = variable1
     expanded_term = term_coefficient + exponentiated_variable1 + exponentiated_variable2
     expanded_binomial.append(expanded_term)
+  return expanded_binomial
+
+def expand_single_variable(terms, exponent, binomial_sign, last_row, binomial_type):
+  # The binomial variables are set as an empty string where they are then defined in an if statement
+  # This is done because one of the terms does not have a variable
+  variable1 = ""
+  variable2 = ""
+  if binomial_type == "first_single_variable":
+    coefficient1 = terms[0].replace(terms[0][len(terms[0])-1], '')
+    coefficient2 = terms[1]
+    variable1 = terms[0][len(terms[0])-1]
+    # Checks if the variable has a coefficient of 1 or -1 by seeing if it is empty or has a negative sign
+    if coefficient1 == "":
+      coefficient1 = "1"
+    elif coefficient1 == "-":
+      coefficient1 = "-1"
+  elif binomial_type == "second_single_variable":
+    coefficient1 = terms[0]
+    coefficient2 = terms[1].replace(terms[1][len(terms[1])-1], '')
+    variable2 = terms[1][len(terms[1])-1]
+    if coefficient2 == "":
+      coefficient2 = "1"
+    # The program does not check for a - sign for the second term because the way that binomials with a negative second term are split results in the - sign being deleted (however, the program still remembers which values are negative)
+  print(coefficient1, variable1, coefficient2, variable2)
+
+  # Binomial expansion
+  expanded_binomial = []
+  for i in range(0,len(last_row)):
+    triangle_coefficient = last_row[i]
+    # Finds the coefficient of this term in expanded form
+    if binomial_sign == "double_negative":
+      exponentiated_coefficient1 = (-1*int(coefficient1)) ** (len(last_row)-1-i)
+    else:
+      exponentiated_coefficient1 = int(coefficient1) ** (len(last_row)-1-i)
+    if binomial_sign == "right_negative" or binomial_sign == "double_negative":
+      exponentiated_coefficient2 = (-1*int(coefficient2)) ** i
+    else:
+      exponentiated_coefficient2 = int(coefficient2) ** i
+    term_coefficient = str(triangle_coefficient * exponentiated_coefficient1 * exponentiated_coefficient2)
+    if variable1 != "":
+      exponentiated_variable1 = variable1 + improve_exponent((len(last_row)-1-i))
+      if improve_exponent((len(last_row)-1-i)) == "⁰":
+        exponentiated_variable1 = ""
+      elif improve_exponent((len(last_row)-1-i)) == "¹":
+        exponentiated_variable1 = variable1
+    else:
+      exponentiated_variable1 = ""
+    if variable2 != "":
+      exponentiated_variable2 = variable2 + improve_exponent(i)
+      if improve_exponent(i) == "⁰":
+        exponentiated_variable2 = ""
+      elif improve_exponent(i) == "¹":
+        exponentiated_variable2 = variable2
+    else:
+      exponentiated_variable2 = ""
+    # The program can only simplify 1 -> "" or -1 -> "-" if there is at least one variable in that term
+    # Otherwise, the program could output a negative sign or empty string if there is no variable next to the coefficient
+    if term_coefficient == "1" and (exponentiated_variable1 != "" or exponentiated_variable2 != ""):
+      term_coefficient = ""
+    elif term_coefficient == "-1" and (exponentiated_variable1 != "" or exponentiated_variable2 != ""):
+      term_coefficient = "-"
+    expanded_term = term_coefficient + exponentiated_variable1 + exponentiated_variable2
+    expanded_binomial.append(expanded_term)
   print(expanded_binomial)
   return expanded_binomial
 
-  
-
 if binomial_type == "simple_single_variable":
-  expanded_binomial = simplify_easy_binomial(terms, exponent, binomial_sign)
+  final_expanded_binomial = simplify_easy_binomial(terms, exponent, binomial_sign)
 elif binomial_type == "double_variable":
   expanded_binomial = double_unique_variables(terms, exponent, binomial_sign, last_row)
+  final_expanded_binomial = ""
+  for i in range(0,len(expanded_binomial)):
+    # The i+1 is done so that the loop will check if the next term is negative or positive and it will concatenate either a - sign or a + sign
+    if i == 0:
+      final_expanded_binomial = final_expanded_binomial + expanded_binomial[0]
+    elif expanded_binomial[i][0] == "-":
+      output_term = expanded_binomial[i].replace('-', '')
+      final_expanded_binomial = final_expanded_binomial + " " + "-" + " " + output_term
+    elif expanded_binomial[i][0] != "-":
+      final_expanded_binomial = final_expanded_binomial + " " + "+" + " " + expanded_binomial[i]
+elif binomial_type == "first_single_variable" or binomial_type == "second_single_variable":
+  expanded_binomial = expand_single_variable(terms, exponent, binomial_sign, last_row, binomial_type)
+  final_expanded_binomial = ""
+  for i in range(0,len(expanded_binomial)):
+    # The i+1 is done so that the loop will check if the next term is negative or positive and it will concatenate either a - sign or a + sign
+    if i == 0:
+      final_expanded_binomial = final_expanded_binomial + expanded_binomial[0]
+    elif expanded_binomial[i][0] == "-":
+      output_term = expanded_binomial[i].replace('-', '')
+      final_expanded_binomial = final_expanded_binomial + " " + "-" + " " + output_term
+    elif expanded_binomial[i][0] != "-":
+      final_expanded_binomial = final_expanded_binomial + " " + "+" + " " + expanded_binomial[i]
 
-
-
-final_expanded_binomial = ""
-for i in range(0,len(expanded_binomial)):
-  # The i+1 is done so that the loop will check if the next term is negative or positive and it will concatenate either a - sign or a + sign
-  if i == 0:
-    final_expanded_binomial = final_expanded_binomial + expanded_binomial[0]
-  elif expanded_binomial[i][0] == "-":
-    output_term = expanded_binomial[i].replace('-', '')
-    final_expanded_binomial = final_expanded_binomial + " " + "-" + " " + output_term
-  elif expanded_binomial[i][0] != "-":
-    final_expanded_binomial = final_expanded_binomial + " " + "+" + " " + expanded_binomial[i]
-  
 print(f"Expanded binomial: {final_expanded_binomial}")
 """
 Input:
