@@ -1,8 +1,12 @@
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+
 inputed_binomial = input("Input your binomial in the format of (cx+ky)^e: ")
-# PC validations maybe
+# PC validations
 split_binomial = inputed_binomial.split("^")
 exponent = int(split_binomial[1])
-
 
 def produce_pascal_triangle(exponent):
   pascal_triangle = [[1]]
@@ -24,7 +28,7 @@ for i in pascal_triangle:
 last_row = pascal_triangle[exponent]
 # This list is later used as the coefficients in binomial expansion
 
-# Just to simplify the string by removing unessecary symbols and characters
+# Just to simplify the string by removing unecessary symbols and characters
 split_binomial[0] = split_binomial[0].replace('(', '')
 split_binomial[0] = split_binomial[0].replace(')', '')
 # The 1 in the argument simply means that the replace() function will only replace the + sign once
@@ -62,6 +66,7 @@ def what_kind_of_binomial(term1_has_variable, term2_has_variable):
   # These if statements are making a variable that stores what kind of binomial was inputed
   return binomial_type
 
+# The following if statements are checking how many negative values are in the binomial to know how to deal with them
 if "-" not in split_binomial[0]:
   binomial_sign = "positive"
   terms = split_binomial[0].split("+")
@@ -119,31 +124,15 @@ elif "-" in split_binomial[0]:
     binomial_type = what_kind_of_binomial(term1_has_variable, term2_has_variable)
     print(binomial_type)
 
-def improve_exponent(exponent):
-  # This function is just for taking a string that would be used as an exponent and making it have superscript characters instead
-  new_exponent = ""
+superscripts = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"]
+
+def format_exponent(exponent):
+  # This just takes an exponent value and converts it into a superscript
+  result = ""
   for i in str(exponent):
-    if i == "0":
-      new_exponent = new_exponent + "⁰"
-    elif i == "1":
-      new_exponent = new_exponent + "¹"
-    elif i == "2":
-      new_exponent = new_exponent + "²"
-    elif i == "3":
-      new_exponent = new_exponent + "³"
-    elif i == "4":
-      new_exponent = new_exponent + "⁴"
-    elif i == "5":
-      new_exponent = new_exponent + "⁵"
-    elif i == "6":
-      new_exponent = new_exponent + "⁶"
-    elif i == "7":
-      new_exponent = new_exponent + "⁷"
-    elif i == "8":
-      new_exponent = new_exponent + "⁸"
-    elif i == "9":
-      new_exponent = new_exponent + "⁹"
-  return new_exponent
+    value = int(i)
+    result = result + superscripts[value]
+  return result
 
 def simplify_easy_binomial(terms, exponent, binomial_sign):
   coefficient1 = terms[0].replace(terms[0][len(terms[0])-1], '')
@@ -156,7 +145,7 @@ def simplify_easy_binomial(terms, exponent, binomial_sign):
     coefficient2 = "1"
   variable = terms[0][len(terms[0])-1]
   # Seperates the coefficients from the variables
-  better_exponent = improve_exponent(exponent)
+  better_exponent = format_exponent(exponent)
   if binomial_sign == "double_negative":
     final_coefficient = str((-1*(int(coefficient1) + int(coefficient2)))**int(exponent))
   elif binomial_sign == "right_negative":
@@ -167,7 +156,7 @@ def simplify_easy_binomial(terms, exponent, binomial_sign):
     expanded_binomial = final_coefficient
   else:
     expanded_binomial = final_coefficient + variable + better_exponent
-  return expanded_binomial
+  return expanded_binomial, final_coefficient
 
 def double_unique_variables(terms, exponent, binomial_sign, last_row):
   coefficient1 = terms[0].replace(terms[0][len(terms[0])-1], '')
@@ -199,18 +188,20 @@ def double_unique_variables(terms, exponent, binomial_sign, last_row):
       term_coefficient = ""
     elif term_coefficient == "-1":
       term_coefficient = "-"
-    exponentiated_variable1 = variable1 + improve_exponent((len(last_row)-1-i))
-    exponentiated_variable2 = variable2 + improve_exponent(i)
-    if improve_exponent(i) == "⁰":
+    exponentiated_variable1 = variable1 + format_exponent((len(last_row)-1-i))
+    exponentiated_variable2 = variable2 + format_exponent(i)
+    if format_exponent(i) == "⁰":
       exponentiated_variable2 = ""
-    elif improve_exponent(i) == "¹":
+    elif format_exponent(i) == "¹":
       exponentiated_variable2 = variable2
-    if improve_exponent((len(last_row)-1-i)) == "⁰":
+    if format_exponent((len(last_row)-1-i)) == "⁰":
       exponentiated_variable1 = ""
-    elif improve_exponent((len(last_row)-1-i)) == "¹":
+    elif format_exponent((len(last_row)-1-i)) == "¹":
       exponentiated_variable1 = variable1
     expanded_term = term_coefficient + exponentiated_variable1 + exponentiated_variable2
-    expanded_binomial.append(expanded_term)
+    # This check prevents a term that is being multiplied by 0 to be later printed out as part of the expanded binomial
+    if term_coefficient != "0":
+      expanded_binomial.append(expanded_term)
   return expanded_binomial
 
 def expand_single_variable(terms, exponent, binomial_sign, last_row, binomial_type):
@@ -251,18 +242,18 @@ def expand_single_variable(terms, exponent, binomial_sign, last_row, binomial_ty
       exponentiated_coefficient2 = int(coefficient2) ** i
     term_coefficient = str(triangle_coefficient * exponentiated_coefficient1 * exponentiated_coefficient2)
     if variable1 != "":
-      exponentiated_variable1 = variable1 + improve_exponent((len(last_row)-1-i))
-      if improve_exponent((len(last_row)-1-i)) == "⁰":
+      exponentiated_variable1 = variable1 + format_exponent((len(last_row)-1-i))
+      if format_exponent((len(last_row)-1-i)) == "⁰":
         exponentiated_variable1 = ""
-      elif improve_exponent((len(last_row)-1-i)) == "¹":
+      elif format_exponent((len(last_row)-1-i)) == "¹":
         exponentiated_variable1 = variable1
     else:
       exponentiated_variable1 = ""
     if variable2 != "":
-      exponentiated_variable2 = variable2 + improve_exponent(i)
-      if improve_exponent(i) == "⁰":
+      exponentiated_variable2 = variable2 + format_exponent(i)
+      if format_exponent(i) == "⁰":
         exponentiated_variable2 = ""
-      elif improve_exponent(i) == "¹":
+      elif format_exponent(i) == "¹":
         exponentiated_variable2 = variable2
     else:
       exponentiated_variable2 = ""
@@ -273,12 +264,30 @@ def expand_single_variable(terms, exponent, binomial_sign, last_row, binomial_ty
     elif term_coefficient == "-1" and (exponentiated_variable1 != "" or exponentiated_variable2 != ""):
       term_coefficient = "-"
     expanded_term = term_coefficient + exponentiated_variable1 + exponentiated_variable2
-    expanded_binomial.append(expanded_term)
+    if term_coefficient != "0":
+      expanded_binomial.append(expanded_term)
   print(expanded_binomial)
   return expanded_binomial
 
-if binomial_type == "simple_single_variable":
-  final_expanded_binomial = simplify_easy_binomial(terms, exponent, binomial_sign)
+def simplify_constant(terms, exponent, binomial_sign):
+  if binomial_sign == "double_negative":
+    simplified_term = (-1*(int(terms[0]) + int(terms[1])))**int(exponent)
+  elif binomial_sign == "right_negative":
+    simplified_term = (int(terms[0]) - int(terms[1]))**int(exponent)
+  else:
+    simplified_term = (int(terms[0]) + int(terms[1]))**int(exponent)
+  expanded_binomial = str(simplified_term)
+  return expanded_binomial
+
+if exponent == 0:
+  # allows the program to skip all the binomial expansion stuff since anything to the power of 0 is equal to 1
+  final_expanded_binomial = "1"
+elif binomial_type == "simple_single_variable":
+  final_expanded_binomial = simplify_easy_binomial(terms, exponent, binomial_sign)[0]
+  # This coefficient will later be used for the graphing component
+  simple_binomial_coefficient = simplify_easy_binomial(terms, exponent, binomial_sign)[1]
+elif binomial_type == "no_variable":
+  final_expanded_binomial = simplify_constant(terms, exponent, binomial_sign)
 elif binomial_type == "double_variable":
   expanded_binomial = double_unique_variables(terms, exponent, binomial_sign, last_row)
   final_expanded_binomial = ""
@@ -305,10 +314,123 @@ elif binomial_type == "first_single_variable" or binomial_type == "second_single
       final_expanded_binomial = final_expanded_binomial + " " + "+" + " " + expanded_binomial[i]
 
 print(f"Expanded binomial: {final_expanded_binomial}")
+print(terms)
+
+# This is to format the term with the variable to have either a 1 or -1 to avoid a bug that happened when the graph code checks if the variable is multiplied by 0
+if binomial_type == "first_single_variable":
+  if terms[0].replace(terms[0][len(terms[0])-1], '') == "":
+    terms[0] = "1" + terms[0]
+  elif terms[0].replace(terms[0][len(terms[0])-1], '') == "-":
+    terms[0] = "-" + terms[0]
+elif binomial_type == "second_single_variable":
+  if terms[1].replace(terms[1][len(terms[1])-1], '') == "":
+    terms[1] = "1" + terms[1]
+  elif terms[1].replace(terms[1][len(terms[1])-1], '') == "-":
+    terms[1] = "-" + terms[1]
+
+# Below here is the code for the graphing
+
+def three_dimensional_graphing_function(x,y,terms):
+  # This function is used to make the equation for z in the 3d graph
+  terms[0] = terms[0].replace(terms[0][len(terms[0])-1], "")
+  if terms[0] == "":
+    terms[0] = "1"
+  elif terms[0] == "-":
+    terms[0] = "-1"
+  terms[1] = terms[1].replace(terms[1][len(terms[1])-1], "")
+  if terms[1] == "":
+    terms[1] = "1"
+  elif terms[1] == "-":
+    terms[1] = "-1"
+  z = (int(terms[0])*x + int(terms[1])*y)**exponent
+  return z
+
+# The program can only make 2d graphs for binomials with one inputed variable like (2x+1)^3
+# The != 0 check is done to make sure that the program will only graph the binomial if the variable is not multiplied by 0 (since there would not be an equation to graph)
+if binomial_type == "first_single_variable" and int(terms[0].replace(terms[0][len(terms[0])-1], '')) != 0:
+  if terms[0].replace(terms[0][len(terms[0])-1], '') == "":
+    first_coefficient = 1
+  elif terms[0].replace(terms[0][len(terms[0])-1], '') == "-":
+    first_coefficient = -1
+  else:
+    first_coefficient = int(terms[0].replace(terms[0][len(terms[0])-1], ''))
+  second_coefficient = int(terms[1])
+  # Implements a horizontal translation for the linspace function's parameters (so that the binomial can be better represented)
+  # The second coefficient is used here because for this kind of binomial, that number is the horizontal translation of the binomial
+  start = -4 - (second_coefficient/first_coefficient)
+  end = 4 - (second_coefficient/first_coefficient)
+
+  x = np.linspace(start, end, 100)
+  # This is the equation of the binomial
+  y = (first_coefficient*x + second_coefficient)**exponent
+
+  fig = plt.figure(figsize = (10, 5))
+  # Create the plot
+  plt.plot(x, y)
+  
+  # Show the plot
+  plt.show()
+elif binomial_type == "second_single_variable" and int(terms[1].replace(terms[1][len(terms[1])-1], '')) != 0:
+  if terms[1].replace(terms[1][len(terms[1])-1], '') == "":
+    second_coefficient = 1
+  elif terms[1].replace(terms[1][len(terms[1])-1], '') == "-":
+    second_coefficient = -1
+  else:
+    second_coefficient = int(terms[0].replace(terms[0][len(terms[0])-1], ''))
+  first_coefficient = int(terms[0])
+  # Implements a horizontal translation for the linspace function's parameters (so that the binomial can be better represented)
+  start = -4 - (first_coefficient/second_coefficient)
+  end = 4 - (first_coefficient/second_coefficient)
+
+  x = np.linspace(start, end, 100)
+  y = (first_coefficient + second_coefficient*x)**exponent
+
+  fig = plt.figure(figsize = (10, 5))
+  # Create the plot
+  plt.plot(x, y)
+  
+  # Show the plot
+  plt.show()
+elif binomial_type == "simple_single_variable":
+
+  # I don't use variables for this linspace function b/c the binomial has no horizontal translation
+  x = np.linspace(-4, 4, 100)
+  y = (int(simple_binomial_coefficient)*x)**exponent
+
+  fig = plt.figure(figsize = (10, 5))
+  # Create the plot
+  plt.plot(x, y)
+  
+  # Show the plot
+  plt.show()
+elif binomial_type == "double_variable":
+  # This produces the range of values that will be used to graph the binomial
+  x = np.linspace(-1, 1, 40)
+  y = np.linspace(-1, 1, 40)
+
+  # This produces a 3d contour graph of the binomial
+  X, Y = np.meshgrid(x, y)
+  Z = three_dimensional_graphing_function(X, Y, terms)
+
+  fig = plt.figure(figsize=(10, 8))
+  ax = plt.axes(projection='3d')
+  
+  ax.plot_surface(X, Y, Z, cmap='cool', alpha=0.8)
+  
+  ax.set_xlabel('x', fontsize=12)
+  ax.set_ylabel('y', fontsize=12)
+  ax.set_zlabel('z', fontsize=12)
+
+  plt.show()
+
+# 3D GRAPHING CODE
+
+
+
+
 """
 Input:
 This is the general format of the input: (cx+ky)^e or (c+ky)^e or (cx+k)^e
-Will not accept (c+k)^e because that does not need to be expanded (there are no variables)
 e is the exponent
 c is the coefficient of x
 k is the coefficient of y
