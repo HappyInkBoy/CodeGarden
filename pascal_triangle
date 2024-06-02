@@ -11,30 +11,29 @@ import re
 print("ICS3U SUMMATIVE PROJECT: BINOMIAL EXPANSION CALCULATOR\nInput a binomial in the format of (#x+#y)^#\n")
 print("# is the number/coefficient\nx is the first variable\ny is the second variable\n")
 # (cx+ky)^e
+
+regular_expressions = {
+  "double_variable": "^\(([-]?[0-9]*)([a-z])([-+][0-9]*)([a-z])\)\^([0-9]+)",
+  "first_single_variable": "^\(([-]?[0-9]*)([a-z])([-+][0-9]+)\)\^([0-9]+)",
+  "second_single_variable": "^\(([-]?[0-9]+)([-+][0-9]*)([a-z])\)\^([0-9]+)",
+  "no_variable": "^\(([-]?[0-9]+)([-+][0-9]+)\)\^([0-9]+)"
+}
+
 while True:
+  # Validation for the user's input
+  matching = False
   inputed_binomial = input("Input your binomial: ")
-  # This is the double variable search (coefficients are optional but 2 variables need to be inputed)
-  x = re.search("^\(([-]?[0-9]*)([a-z])([-+][0-9]*)([a-z])\)\^([0-9]+)", inputed_binomial)
-  if x:
+  for key in regular_expressions:
+    if re.search(regular_expressions[key], inputed_binomial):
+      binomial_type = key
+      matching = True
+      break
+  if matching == True:
     break
   else:
-    # This is the left single variable search (Left term must have a variable and right term must have a constant)
-    x = re.search("^\(([-]?[0-9]*)([a-z])([-+][0-9]+)\)\^([0-9]+)", inputed_binomial)
-    if x:
-      break
-    else:
-      # This is the right single variable search (Same as last one except right and left are switched)
-      x = re.search("^\(([-]?[0-9]+)([-+][0-9]*)([a-z])\)\^([0-9]+)", inputed_binomial)
-      if x:
-        break
-      else:
-        # This is the binomial with only constants
-        x = re.search("^\(([-]?[0-9]+)([-+][0-9]+)\)\^([0-9]+)", inputed_binomial)
-        if x:
-          break
-        else:
-          print("You typed the binomial incorrectly")
+    print("The binomial was not typed correctly")
 
+print(binomial_type)
 
 os.system('clear')
 split_binomial = inputed_binomial.split("^")
@@ -337,17 +336,19 @@ elif binomial_type == "first_single_variable" or binomial_type == "second_single
 
 print(f"Expanded binomial: {final_expanded_binomial}")
 
+print("Terms:", terms)
+
 # This is to format the term with the variable to have either a 1 or -1 to avoid a bug that happened when the graph code checks if the variable is multiplied by 0
 if binomial_type == "first_single_variable":
   if terms[0].replace(terms[0][len(terms[0])-1], '') == "":
     terms[0] = "1" + terms[0]
   elif terms[0].replace(terms[0][len(terms[0])-1], '') == "-":
-    terms[0] = "-" + terms[0]
+    terms[0] = terms[0].replace("-", "-1")
 elif binomial_type == "second_single_variable":
   if terms[1].replace(terms[1][len(terms[1])-1], '') == "":
     terms[1] = "1" + terms[1]
   elif terms[1].replace(terms[1][len(terms[1])-1], '') == "-":
-    terms[1] = "-" + terms[1]
+    terms[1] = terms[1].replace("-", "-1")
 
 # Below here is the code for the graphing
 
@@ -397,7 +398,7 @@ elif binomial_type == "second_single_variable" and int(terms[1].replace(terms[1]
   elif terms[1].replace(terms[1][len(terms[1])-1], '') == "-":
     second_coefficient = -1
   else:
-    second_coefficient = int(terms[0].replace(terms[0][len(terms[0])-1], ''))
+    second_coefficient = int(terms[1].replace(terms[1][len(terms[1])-1], ''))
   first_coefficient = int(terms[0])
   # Implements a horizontal translation for the linspace function's parameters (so that the binomial can be better represented)
   start = -4 - (first_coefficient/second_coefficient)
@@ -447,7 +448,7 @@ elif binomial_type == "double_variable":
 # 3D GRAPHING CODE
 
 
-
+print(binomial_type)
 
 """
 How to use matplotlib for the 2d & 3d graphing: https://www.kaggle.com/code/imoore/2d-and-3d-plotting-tutorial-in-python
