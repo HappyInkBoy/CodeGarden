@@ -1,0 +1,333 @@
+"""
+player AI for batterShip
+ICS4U
+Alexandre Cornu
+Runs an algorithm that goes through every row/column of a 100 x 100 grid until all ships have been sunk.
+History:
+Aug 2023: Program creation
+Sept 13, 2024: Started to work on making the program check around a 'hit' location
+Sept 14, 2024: Finished the first version of the algorithm in a test file
+Sept 16, 2024: Created the second version of the algorithm in a test file (the first version was too slow)
+Sept 17, 2024: Implemented the second version of the new algorithm into playerAI.py
+Sept 18, 2024: Modified the algorithm to be able to have it's search range be restricted (done to speed up the program)
+"""
+
+from __main__ import bombCrate #import from battership
+import random
+import copy
+import math
+
+
+
+WIDTH_OF_GRID = 100
+max_search_range = int((WIDTH_OF_GRID-2)/2) # This variable will be used later to restrict how many points the algorithm has to check
+
+row_list = []
+for x in range(0,WIDTH_OF_GRID):
+  row_list.append([])
+
+def createList(r = 100, c = 100):
+    """
+    Creates a 2D list filled with 0s
+    Args:
+        r (int): number of rows
+        c (int): number of cols
+    Returns:
+        boardList [List[List[Int]]]
+    """
+    
+    return [[0 for j in range(c)] for i in range(r)]
+
+def cratesAroundShip(grid, curRow, curCol):
+    """
+    This function checks the crates around a ship part to set the unbombed areas to "miss" (so that the program does not try to hit those points)
+    This is done because different ships cannot be adjacent to each other
+
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+        curRow (int): index of the sublist which contains the crate being evaluated
+        curCol (int): index of the element in the sublist which contains the crate being evaluated
+
+    Returns:
+        grid (2d list): The grid is updated to prevent the program from firing a crate that is adjacent to a sunk ship crate
+
+    """
+    global row_list
+    if curRow > 0: # Done to prevent the program from checking a list who's index is out of range
+        if grid[curRow-1][curCol] == 0:
+            grid[curRow-1][curCol] = -1
+            row_list[curRow].append(curCol)
+    if curRow < WIDTH_OF_GRID-1:
+        if grid[curRow+1][curCol] == 0:
+            grid[curRow+1][curCol] = -1
+            row_list[curRow].append(curCol)
+    if curCol > 0:
+        if grid[curRow][curCol-1] == 0:
+            grid[curRow][curCol-1] = -1
+            row_list[curRow].append(curCol)
+    if curCol < WIDTH_OF_GRID-1:
+        if grid[curRow][curCol+1] == 0:
+            grid[curRow][curCol+1] = -1
+            row_list[curRow].append(curCol)
+    return grid
+
+
+def set_hit_to_miss(grid, rowSank, colSank):
+    """
+    Converts all the crates labelled with '1' to '-2'
+    The '-2' is just a way of labelling a crate as being 'sunk'
+
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+        rowSank (int): the index of the sublist which contains the sunk crate
+        colSank (int): the index of the element in the sublist which contains the sunk crate
+    Return:
+        grid (2d list): The 2d list is updated to prevent the algorithm from bombing a crate that has already been sunk
+    """
+    global row_list
+    for row in range(0,WIDTH_OF_GRID):
+        for col in range(0,WIDTH_OF_GRID):
+            if grid[row][col] == 1:
+                # The -2 is meant to show that the ship has been sunk at that location
+                grid[row][col] = -2
+                row_list[row].append(col)
+                grid = cratesAroundShip(grid, row, col)
+    return grid
+
+# return the adjacent value of grid[row][col] in the following cases
+# neighbor: 0 TOP, 1 RIGHT, 2 DOWN, 3 LEFT
+# return -100 if no neighbour (out of bound)
+def getAdjacentValue(grid, row, col, neighbor):
+    """
+    This function checks either up, down, left, or right depending on the 'neighbor' parameter
+
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+        row (int): index of the sublist which contains the crate being evaluated
+        col (int): index of the element in the sublist which contains the crate being evaluated
+        neighbor (string): a string that is used to know which adjacent crate to check
+
+    Returns:
+        grid[row][col+1] (int): The value of the right neighbor crate
+        grid[row+1][col] (int): The value of the bottom neighbor crate
+        grid[row][col-1] (int): The value of the left neighbor crate
+        grid[row-1][col] (int): The value of the top neighbor crate
+    """
+    if neighbor == "right" and col < WIDTH_OF_GRID - 1:
+        return grid[row][col + 1]
+    if neighbor == "left" and col > 0:
+        return grid[row][col - 1]
+    if neighbor == "up" and row > 0:
+        return grid[row-1][col]
+    if neighbor == "down" and row < WIDTH_OF_GRID - 1:
+        return grid[row+1][col]
+  
+
+
+def closest_missed_point(grid, row, col, initial_restriction_width):
+    """
+    Determines the closest (already bombed) crate to the crate being evaluated and returns a distance value that will later be used to evaluate which crate is the best to bomb next
+
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+        row (int): index of the sublist which contains the crate being evaluated
+        col (int): index of the element in the sublist which contains the crate being evaluated
+        initial_restriction_width (int): The distance of the crate to the border of the grid. This is used to prevent the algorithm from having a list index be out of range
+    
+    Returns:
+        min_distance (int): An integer that represents how many cycles around the crate only contain unbombed crates. This is later used as a way to score how likely each crate is to have a ship part
+      
+        example: if min_distance == 2:
+        0 0 0 0 0
+        0 0 0 0 0
+        0 0   0 0 (2 cycles of unbombed crates around the center crate)
+        0 0 0 0 0
+        0 0 0 0 0
+
+    """
+    global row_list
+
+    # This is an arbitrarily large number for the sake of defining min_distance by a smaller distance
+    min_distance = 10**100
+
+    if initial_restriction_width < max_search_range:
+        # If the point is closer to the border than the width of max_search_range, the point will be restricted by its distance to the border
+        search_restriction = initial_restriction_width
+    else:
+        search_restriction = max_search_range
+
+    for row_index, coord in enumerate(row_list):
+        # not coord means if there are no elements in the list 'coords'
+        if not coord or row_index < row-search_restriction or row_index > row+search_restriction:
+            # Skips over the rows that don't have any points already checked
+            # Also skips any row that does not fit within the search restriction (done to prevent the program from checking unecessary missed points)
+            continue
+        else:
+            # Will only calculate the score if the column coordinate value is within the search restriction
+            # The search restriction is used to prevent the algorithm from having to search bombed crates that are far enough away from the crate being evaluated
+            # Without the search restriction, the program would take forever to run
+            for col_index in coord:
+                if col_index >= col-search_restriction and col_index <= col+search_restriction:
+                    x_distance = abs(col_index-col)
+                    y_distance = abs(row_index-row)
+                    score = max(x_distance,y_distance)-1
+                    if score < min_distance:
+                        min_distance = score
+          
+
+    if min_distance == 10**100: # If the search restriction made it so that the point being evaluated could not find another checked point to calculate the score
+      min_distance = search_restriction
+
+    return min_distance
+
+
+
+def crate_distance_value(grid, row, col):
+    """
+    Evaluates a 'score' for a given crate based off its distance from the closest crate that had already been bombed
+    This means that a crate with a score of 30 will be surrounded by more unbombed crates than one with a score of 2
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+        row (int): index of the sublist which contains the crate being evaluated
+        col (int): index of the element in the sublist which contains the crate being evaluated
+    
+    Returns:
+        score (int): An integer ranging from 0->100. This represents how far a crate is from other crates that have already been bombed. The algorithm favors crates that are further from bombed crates
+    """
+    distance_to_top_border = row
+    distance_to_bottom_border = WIDTH_OF_GRID-row-1
+    distance_to_left_border = col
+    distance_to_right_border = WIDTH_OF_GRID-col-1
+    
+    # This variable is an int that represents the distance between the crate and the nearest border of the grid
+    initial_restriction_width = min(distance_to_top_border,distance_to_bottom_border,distance_to_left_border,distance_to_right_border)
+
+    # This is initial because I may end up restricting the point search further for points that are in the middle of the grid
+
+    score = closest_missed_point(grid, row, col, initial_restriction_width)
+    if score > initial_restriction_width: # If the crate being evaluated is closer to the border than the closest crate that had already been bombed
+        score = initial_restriction_width
+
+    return score
+
+
+
+
+def score(grid, row, col):
+    """
+    Determines what 'score' to give to a crate.
+    If it was already bombed, it has a score of -100
+    If it is adjacent to a crate that was confirmed to have a ship part (recieved the 'hit' message), it has a score of 1000
+    If it is neither, then it is assigned a 'score' through calling the crate_distance_value() function (the score ranges from 0->100)
+    Crates with a score of -100 are the lowest priority when deciding where to bomb next
+    Crates with a score of 1000 are the highest priority (because if I know that I hit a ship part somewhere, I want to hit every surrounding point to sink the ship parts)
+
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+        row (int): index of the sublist which contains the crate being evaluated
+        col (int): index of the element in the sublist which contains the crate being evaluated
+      
+    Returns:
+        (int): This value is a 'score' that the algorithm later uses to determine the best crate to bomb next
+
+    """
+    value = grid[row][col]
+    if value == -1:
+        # Low score since we already bombed that crate
+        return -100
+    if value == 0:
+        # In the future, we will check adjacent crates if they have a value of 1 (since that is where a ship part may be)
+        topValue = getAdjacentValue(grid, row, col, "up")
+        rightValue = getAdjacentValue(grid, row, col, "right")
+        downValue = getAdjacentValue(grid, row, col, "down")
+        leftValue = getAdjacentValue(grid, row, col, "left")
+        if topValue == 1 or rightValue == 1 or downValue == 1 or leftValue == 1:
+          return 1000 # Highest priority is given to a point that is adjacent to a ship crate
+        else:
+          score = crate_distance_value(grid, row, col)
+          return score # Score is an int ranging from 0 -> 100
+    if value == 1 or value == -2:
+        # No need to bomb a crate that has already been bombed
+        return -100
+    # The function should never get here
+    return -100
+
+
+def getBestMove(grid):
+    """
+    Compares the score of every crate on the grid to determine which are the best to bomb next
+    If there are multiple crates with the best score, the program randomly chooses one of them
+    
+    Args:
+        grid (2d list): marks unbombed crates with '0', missed crates with '-1', hit crates with '1', and sunk crates with '-2'
+    
+    Returns:
+        bestMoves[choice] (1d list): A list containing the coordinates of the best crate to bomb next
+    """
+
+    # Assigning a smaller value manually
+    bestScore = -1000
+
+    for row in range(0,WIDTH_OF_GRID):
+        for col in range(0,WIDTH_OF_GRID):
+            s = score(grid, row, col)
+            if s > bestScore: # If the current score is greater than the previous best score
+                bestMoves = [[row,col]]
+                bestScore = s
+            elif s == bestScore: # If the current score is equal to the best recorded score
+                bestMoves.append([row, col]) # Records the coordinates of the crate
+
+    # Variable that determines which crate from the bestMoves list is returned
+    choice = random.randint(0,len(bestMoves)-1)
+    return bestMoves[choice]
+
+
+def bombWarehouse():
+    """
+    This function bombs a specific crate that had been chosen by the algorithm
+
+    Returns:
+        'done'
+    """
+    bombedList = createList(WIDTH_OF_GRID,WIDTH_OF_GRID)
+    global row_list
+    global max_search_range
+
+    numSunk = 0
+    curCol = 0
+    curRow = 0
+    bombResult = 0
+
+    crate_destroyed_counter = 0 # This counter will be used to evaluate when to restrict the search range of the algorithm
+
+
+    while numSunk != 5:
+        # The +1 is to prevent the max_search_range variable to be reduced at the start of the program (when crate_destroyed_counter == 0, it would return 0 when modulo is applied)
+        if (crate_destroyed_counter+1)%10 == 0 and max_search_range > 2:
+          # The max_search_range > 2 prevents the search range from becoming negative
+          # Also, I chose >2 instead of >0 to still allow the algorithm to search every crate around the point being evaluated
+          # Every 10 times the program breaks a crate, it will restrict the search range of the algorithm
+          max_search_range -= 2
+        if crate_destroyed_counter%1000 == 0:
+          print(crate_destroyed_counter)
+          # REMOVE THIS BEFORE SUBMITTING
+        move = getBestMove(bombedList)
+        # Coordinates of the targeted crate
+        curRow = move[0]
+        curCol = move[1]
+        bombResult = bombCrate(curRow, curCol)
+        if bombResult == "hit":
+            crate_destroyed_counter += 1
+            bombedList[curRow][curCol] = 1 # being set to 1 means that the program will search around that point to check for other ship parts
+        if bombResult == "miss":
+            crate_destroyed_counter += 1
+            bombedList[curRow][curCol] = -1  # and record the bombing
+            row_list[curRow].append(curCol)
+        if bombResult == 'sunk':  # If sunk, increase counter
+            crate_destroyed_counter += 1
+            bombedList[curRow][curCol] = 1
+            numSunk += 1
+            print(f"{numSunk}, [{curRow},{curCol}]") # REMOVE this before submitting
+            set_hit_to_miss(bombedList, curRow, curCol)
+
+    return 'done'
