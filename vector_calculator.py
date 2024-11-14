@@ -5,7 +5,7 @@ Contains the classes for Vector and Matrix
 History:
 Nov 8, 2024: Added the __init__(), components() setter and getter, magnitude, __add__(), __sub__(), __mul__(), dot_product(), and is_same_dimension() methods
 Nov 11, 2024: Added the Op() class. Removed the dot_product() method from the Vector class and added it to the Op class. Added cross_product() method to Op. Added __str__() magic method to Vector
-
+Nov 14, 2024: Added the angle_betwen_vectors() method
 """
 import math
 
@@ -166,15 +166,37 @@ class Op():
       raise Exception("Cross product can only be used for vectors exclusively in 3d")
 
     return v3
-
+  
+  @classmethod
+  def angle_between_vectors(cls, v1, v2):
+    """
+    Finds the angle between to given vecters using the dot product
+    Args:
+      v1 (Vector): The first vector
+      v2 (Vector): The second vector
+    Returns:
+      angle (float): The angle between the two vectors (in degrees)
+    """
+    if Vector.is_same_dimension(v1, v2):
+      if v1.magnitude() == 0 or v2.magnitude() == 0:
+        raise ValueError("Cannot find the angle between two vectors if one of them is the zero vector")
+      numerator = cls.dot_product(v1,v2)
+      denominator = v1.magnitude()*v2.magnitude()
+      
+      angle = math.acos(numerator/denominator)
+      # converts to degrees
+      angle = round(angle*(360/math.tau), 2)
+    else:
+      raise Exception("Cannot evaluate the angle between two vectors with different dimesions")
+    return angle
 # ---------------------------
 # Below is the main.py code
 # ---------------------------
 
-v1 = Vector([3,3,4])
+v1 = Vector([1,-1])
 
-v2 = Vector([3,-4,1])
+v2 = Vector([0,0])
 
-r = Op.cross_product(v1,v2)
+#r = Op.angle_between_vectors(v1,v2)
 
-print(r)
+print(v2.magnitude() == 0)
