@@ -13,13 +13,13 @@ class Vector():
   """
   Creates a vector object in any dimension
   Attributes:
-    _components (list): A list containing n amount of components of an n-dimentional vector
+    _components (list[float]): A list containing n amount of components of an n-dimentional vector
   """
   def __init__(self, components):
     """
     Assigns values to the vector object
     Args:
-      components (list): A list that contains the components of the vector
+      components (list[float]): A list that contains the components of the vector
     """
     self.components = components
 
@@ -120,6 +120,48 @@ class Vector():
       same_dimension = len(v1.components) == len(v2.components)
     return same_dimension
 
+
+class Matrix():
+  """
+  Creates a matrix of any dimension
+  Example of how it looks:
+  [[Vector],[Vector],[Vector]]
+  Attributes:
+    elements (list[list[float]]): This 2d list contains the elements present in the matrix
+    square (bool): True if the matrix has equal length for its rows and collumns
+  """
+
+  def __init__(self, elements):
+    """
+    Assigns values to the Matrix object
+    Args:
+      elements (list[list[float]]): A 2d list containing the elements present in the matrix
+    """
+    validate_matrix(elements):
+    vector_list = []
+    for sublist in elements:
+      vector_list.append(Vector(sublist))
+  
+  @staticmethod
+  def validate_matrix(elements):
+    """
+    Validates the given list of elements to ensure that they are only made up of ints or floats
+    Raises an error if the given 2d list is not valid
+    Args:
+      elements (list[list[float]]): A 2d list containing the elements present in the matrix
+    """
+    if not isinstance(elements, list):
+      raise TypeError("Matrix class requires a 2d list of ints or floats to be passed as an argument")
+    
+    collumn_length = len(elements[0])
+
+    for sublist in elements:
+      if len(sublist) != collumn_length: # Verifies that the matrix has consistent lengths
+        raise Exception("The sublists in the provided argument must have equal lengths")
+      for component in sublist:
+        if not isinstance(component, int) and not isinstance(component, float):
+          raise TypeError("The elements in the 2d list must be either an int or a float")
+        
 
 class Op():
   """
