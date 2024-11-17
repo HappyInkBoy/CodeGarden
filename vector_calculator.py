@@ -6,6 +6,8 @@ History:
 Nov 8, 2024: Added the __init__(), components() setter and getter, magnitude, __add__(), __sub__(), __mul__(), dot_product(), and is_same_dimension() methods
 Nov 11, 2024: Added the Op() class. Removed the dot_product() method from the Vector class and added it to the Op class. Added cross_product() method to Op. Added __str__() magic method to Vector
 Nov 14, 2024: Added the angle_betwen_vectors() method
+Nov 15, 2024: Added the __init__() method, validate_matrix() method, multiply() method
+Nov 16, 2024: Modified the __init() method to assign the Matrix class a list of Vector objects and added the from_2d_list() method. Added the __str__() magic method for Matrix class
 """
 import math
 
@@ -127,29 +129,53 @@ class Matrix():
   Example of how it looks:
   [[Vector],[Vector],[Vector]]
   Attributes:
-    elements (list[list[float]]): This 2d list contains the elements present in the matrix
+    vector_list (list[Vector]): This 2d list contains the elements present in the matrix
     square (bool): True if the matrix has equal length for its rows and collumns
   """
 
-  def __init__(self, elements):
+  def __init__(self, vector_list):
     """
     Assigns values to the Matrix object
     Args:
-      elements (list[list[float]]): A 2d list containing the elements present in the matrix
+      vector_list (list[Vector]): A list of vectors with equal dimensions
     """
-    validate_matrix(elements):
-    vector_list = []
-    for sublist in elements:
-      vector_list.append(Vector(sublist))
+    self.validate_matrix(vector_list)
+    self.vector_list = vector_list
+    # This can use the first vector of vector_list because the vectors have already been validated to be of equal dimensions
+    self.square = len(vector_list) == len(vector_list[0].components)
+    
   
   @staticmethod
-  def validate_matrix(elements):
+  def validate_matrix(vector_list):
     """
     Validates the given list of elements to ensure that they are only made up of ints or floats
     Raises an error if the given 2d list is not valid
     Args:
-      elements (list[list[float]]): A 2d list containing the elements present in the matrix
+      vector_list (list[Vector]): A list of vectors with equal dimensions
     """
+    if not isinstance(vector_list, list):
+      raise TypeError(f"{type(vector_list)} type argument is not valid for instantiating a Matrix object")
+
+    for vector in vector_list:
+      if not isinstance(vector, Vector):
+        raise TypeError("Matrix class requires a list of Vector object to be instantiated")
+    
+    # Multiple for loops have to be used since this validation below requires that all of the elements in vector_list have been validated to be Vectors
+    comparison_vector = vector_list[0]
+    for vector in vector_list:
+      if not Vector.is_same_dimension(comparison_vector,vector):
+        raise Exception("All vectors in the list must have equal dimensions")
+  
+  @classmethod
+  def from_2d_list(cls,elements):
+    """
+    Creates a matrix object from a list of vectors
+    Args:
+      elements (list[list[float]]): A 2d list containing the elements present in the matrix
+    Returns:
+      cls(vector_list) (Matrix): A matrix object made from a 2d list of vector components
+    """
+
     if not isinstance(elements, list):
       raise TypeError("Matrix class requires a 2d list of ints or floats to be passed as an argument")
     
@@ -161,7 +187,52 @@ class Matrix():
       for component in sublist:
         if not isinstance(component, int) and not isinstance(component, float):
           raise TypeError("The elements in the 2d list must be either an int or a float")
-        
+    
+    vector_list = []
+    for sublist in elements:
+      vector_list.append(Vector(sublist))
+
+    return cls(vector_list)
+
+
+  def multiply(self, other_matrix):
+    """
+    This is the function for matrix-vector/matrix-matrix multiplication
+    Args:
+      other_matrix (Matrix or Vector): The vector/matrix who is being transformed by the calling matrix
+    Returns:
+      transformed_matrix (Matrix or Vector): The resulting tranformation/vector after being transformed by the calling matrix
+    """
+    # Add validations later
+    if isinstance(other_matrix, Vector):
+      other_matrix_vectors = [other_matrix] # Turns it into a 2d list due to how the algorithm works for matrix multiplication
+    else:
+      other_matrix_vectors = other_matrix.vector_list
+
+    transformed_matrix_list = []
+
+    for vector in other_matrix_vectors:
+      transformed_vector = Vector([0,0]) # Creates the zero vector
+      for index, comp in enumerate(vector.components):
+        # (Note to self) This calculation could be a bit cleaner if you made __iadd__() for the Vector class
+        transformed_vector = transformed_vector + self.vector_list[index]*comp
+      transformed_matrix_list.append(transformed_vector)
+    
+    if len(transformed_matrix_list) == 1:
+      transformed_matrix = transformed_matrix_list[0]
+    else:
+      transformed_matrix = Matrix(transformed_matrix_list)
+
+    return transformed_matrix
+
+  def __str__(self):
+    """
+    Returns a list of the components of the vectors in the Matrix object
+    """
+    printable_list = []
+    for vector in self.vector_list:
+      printable_list.append(vector.components)
+    return str(printable_list)
 
 class Op():
   """
@@ -235,10 +306,17 @@ class Op():
 # Below is the main.py code
 # ---------------------------
 
-v1 = Vector([1,-1])
+v1 = Vector([0,1])
 
-v2 = Vector([0,0])
+v2 = Vector([-1,0])
+
+M1 = Matrix([v1,v2])
+
+v3 = Vector([4,5])
+v4 = Vector([2,3])
+
+M2 = Matrix([v3,v4])
 
 #r = Op.angle_between_vectors(v1,v2)
 
-print(v2.magnitude() == 0)
+print(M1.multiply(M2))
